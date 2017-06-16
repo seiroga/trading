@@ -1,0 +1,6 @@
+[submodule "Libraries/3rdParty/boost"]
+	path = Libraries/3rdParty/boost
+	url = https://github.com/boostorg/boost.git
+[submodule "Libraries/3rdParty/cpprest"]
+	path = Libraries/3rdParty/cpprest
+	url = https://github.com/Microsoft/cpprestsdk.git
