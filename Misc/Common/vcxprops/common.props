@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <ProjRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</ProjRootDir>
+    <ProjOutSubDir>$(PlatformShortName)\</ProjOutSubDir>
+    <ProjObjSubDir>$(PlatformShortName)\_obj\$(Configuration)\$(ProjectName)\</ProjObjSubDir>
+    <ProjLibSubDir>$(PlatformShortName)\_lib\$(Configuration)\</ProjLibSubDir>
+    <ProjBinSubDir>$(PlatformShortName)\_bin\</ProjBinSubDir>
+    <ProjIntDir>$(ProjRootDir)$(ProjObjSubDir)</ProjIntDir>
+    <ProjOutDir>$(ProjRootDir)$(ProjOutSubDir)</ProjOutDir>
+    <ProjOutObjDir>$(ProjRootDir)$(ProjObjSubDir)</ProjOutObjDir>
+    <ProjOutLibDir>$(ProjRootDir)$(ProjLibSubDir)</ProjOutLibDir>
+    <ProjOutBinDir>$(ProjRootDir)$(ProjBinSubDir)</ProjOutBinDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_SYSTEM_NO_DEPRECATED;BOOST_ERROR_CODE_HEADER_ONLY;BOOST_ALL_NO_LIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4503</DisableSpecificWarnings>
+      <TreatSpecificWarningsAsErrors>4715</TreatSpecificWarningsAsErrors>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level3</WarningLevel>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalOptions>/Zo %(AdditionalOptions)</AdditionalOptions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+    </Lib>
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="ProjRootDir">
+      <Value>$(ProjRootDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjOutSubDir">
+      <Value>$(ProjOutSubDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjObjSubDir">
+      <Value>$(ProjObjSubDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjLibSubDir">
+      <Value>$(ProjLibSubDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjBinSubDir">
+      <Value>$(ProjBinSubDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjIntDir">
+      <Value>$(ProjIntDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjOutDir">
+      <Value>$(ProjOutDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjOutObjDir">
+      <Value>$(ProjOutObjDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjOutLibDir">
+      <Value>$(ProjOutLibDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="ProjOutBinDir">
+      <Value>$(ProjOutBinDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
