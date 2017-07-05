@@ -21,7 +21,7 @@ namespace sqlite
 		sqlite3_stmt* prepare_statement(sqlite3* db_handle, const std::wstring& query)
 		{
 			sqlite3_stmt* result = nullptr;
-			exception::check(db_handle, ::sqlite3_prepare16_v2(db_handle, query.c_str(), query.length() * sizeof(wchar_t), &result, nullptr));
+			exception::check(db_handle, ::sqlite3_prepare16_v2(db_handle, query.c_str(), (int)query.length() * sizeof(wchar_t), &result, nullptr));
 
 			return result;
 		}
@@ -136,13 +136,13 @@ namespace sqlite
 			void operator ()(const binary_t& val)
 			{
 				// SB: can be performance overhead here, since SQLITE makes own copy of data
-				exception::check(db_handle, ::sqlite3_bind_blob(stmt_handle, index, val.data(), val.size(), SQLITE_TRANSIENT));
+				exception::check(db_handle, ::sqlite3_bind_blob(stmt_handle, index, val.data(), (int)val.size(), SQLITE_TRANSIENT));
 			}
 
 			void operator ()(const std::wstring& val)
 			{
 				// SB: can be performance overhead here, since SQLITE makes own copy of data
-				exception::check(db_handle, ::sqlite3_bind_text16(stmt_handle, index, val.data(), val.size() * sizeof(wchar_t), SQLITE_TRANSIENT));
+				exception::check(db_handle, ::sqlite3_bind_text16(stmt_handle, index, val.data(), (int)val.size() * sizeof(wchar_t), SQLITE_TRANSIENT));
 			}
 
 			void operator ()(const vnull_t& val)
@@ -181,6 +181,11 @@ namespace sqlite
 	statement::ptr connection::create_statement(const std::wstring& query)
 	{
 		return std::make_shared<statement>(m_handle, query);
+	}
+
+	connection::ptr connection::create(const std::wstring& db_path)
+	{
+		return std::make_shared<connection>(db_path);
 	}
 
 	connection::connection(const std::wstring& db_path)

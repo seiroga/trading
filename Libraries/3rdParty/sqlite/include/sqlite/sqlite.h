@@ -76,8 +76,9 @@ namespace sqlite
 	private:
 		sqlite3* m_handle;
 
-	private:
+	public:
 		statement::ptr create_statement(const std::wstring& query);
+		static ptr create(const std::wstring& db_path);
 
 	public:
 		connection(const std::wstring& db_path);

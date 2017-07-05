@@ -5,8 +5,8 @@
     <ProjRootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</ProjRootDir>
     <ProjOutSubDir>$(PlatformShortName)\</ProjOutSubDir>
     <ProjObjSubDir>$(PlatformShortName)\_obj\$(Configuration)\$(ProjectName)\</ProjObjSubDir>
-    <ProjLibSubDir>$(PlatformShortName)\_lib\$(Configuration)\</ProjLibSubDir>
-    <ProjBinSubDir>$(PlatformShortName)\_bin\</ProjBinSubDir>
+    <ProjLibSubDir>$(PlatformShortName)\_lib\$(Configuration)\$(ProjectName)\</ProjLibSubDir>
+    <ProjBinSubDir>$(PlatformShortName)\_bin\$(Configuration)\$(ProjectName)\</ProjBinSubDir>
     <ProjIntDir>$(ProjRootDir)$(ProjObjSubDir)</ProjIntDir>
     <ProjOutDir>$(ProjRootDir)$(ProjOutSubDir)</ProjOutDir>
     <ProjOutObjDir>$(ProjRootDir)$(ProjObjSubDir)</ProjOutObjDir>
