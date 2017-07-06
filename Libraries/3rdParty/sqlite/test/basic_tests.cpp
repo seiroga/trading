@@ -1,4 +1,5 @@
 #define BOOST_TEST_MODULE SQLITE Tests
+
 #include <boost/test/included/unit_test.hpp>
 
 #include <sqlite/sqlite.h>
@@ -25,6 +26,11 @@ namespace win
 
 namespace
 {
+	bool operator==(const std::wstring& lhs, const std::wstring& rhs)
+	{
+		return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+	}
+
 	std::wstring generate_guid()
 	{
 		GUID guid = { 0 };
@@ -114,6 +120,7 @@ struct temp_dir_fixture : basic_fixture
 BOOST_FIXTURE_TEST_CASE(create_new, temp_dir_fixture)
 {
 	// INIT
+	temp_dir_fixture fixture;
 	basic_fixture::temp_folder tmp_folder;
 	const auto db_name = basic_fixture::unique_string();
 	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
@@ -155,4 +162,51 @@ BOOST_FIXTURE_TEST_CASE(create_table, temp_dir_fixture)
 	// ACT
 	auto st = db->create_statement(L"CREATE TABLE T1(column1 INTEGER, column2 TEXT, column3 FLOAT, PRIMARY KEY(column1))");
 	st->step();
+
+	bool thrown = false;
+	try
+	{
+		// try to create table with same name
+		st = db->create_statement(L"CREATE TABLE T1(primary_column INTEGER, PRIMARY KEY(primary_column))");
+		st->step();
+	}
+	catch (const sqlite::exception& )
+	{
+		thrown = true;
+	}
+
+	BOOST_TEST(thrown);
+}
+
+BOOST_FIXTURE_TEST_CASE(insert_data, temp_dir_fixture)
+{
+	// INIT
+	basic_fixture::temp_folder tmp_folder;
+	const auto db_name = basic_fixture::unique_string();
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+
+	// ASSERT
+	BOOST_TEST(db != nullptr);
+
+	// INIT
+	const std::wstring expected_value = L"some text";
+	auto st = db->create_statement(L"CREATE TABLE T1(column1 INTEGER, column2 TEXT, column3 FLOAT, PRIMARY KEY(column1))");
+	st->step();
+
+	// ACT
+	st = db->create_statement(L"INSERT INTO T1 VALUES(?1, ?2, ?3)");
+	st->bind_value(24, 1);
+	st->bind_value(expected_value, 2);
+	st->bind_value(45345.0342, 3);
+	st->step();
+
+	st = db->create_statement(L"SELECT column2 FROM T1 WHERE column1 = ?1");
+	st->bind_value(24, 1);
+	
+	// ACT / ASSERT
+	BOOST_TEST(st->step());
+
+	auto text_value = st->get_value<std::wstring>(0);
+	bool res = text_value == expected_value;
+	BOOST_TEST(res);
 }

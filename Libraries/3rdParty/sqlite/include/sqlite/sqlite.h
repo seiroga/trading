@@ -48,13 +48,13 @@ namespace sqlite
 
 	public:
 		void reset();
-		void step();
+		bool step();
 
 		template<typename T>
 		T get_value(int column_index)
 		{
 			auto value = get_value_impl(column_index);
-			auto res = boost::get<T*>(&value);
+			auto res = boost::get<T>(&value);
 			if (nullptr == res)
 				throw std::runtime_error(__FUNCTION__ " Invalid value type!");
 

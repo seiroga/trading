@@ -47,19 +47,22 @@ namespace sqlite
 		exception::check(m_db_handle, ::sqlite3_reset(m_handle));
 	}
 
-	void statement::step()
+	bool statement::step()
 	{
 		// execute
 		auto res_code = ::sqlite3_step(m_handle);
 		switch (res_code)
 		{
 			case SQLITE_DONE:
+				return false;
 			case SQLITE_ROW:
-				break;
+				return true;
 
 		default:
 			exception::check(m_db_handle, res_code);
 		}
+
+		return false;
 	}
 
 	value_t statement::get_value_impl(int column_index)
