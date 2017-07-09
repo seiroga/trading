@@ -1,6 +1,8 @@
 #include <sqlite/sqlite.h>
 #include "sqlite3.h"
 
+#include <boost/numeric/conversion/cast.hpp>
+
 namespace sqlite
 {
 	namespace
@@ -112,6 +114,17 @@ namespace sqlite
 		return res;
 	}
 
+	template<>
+	int statement::get_value(int column_index)
+	{
+		auto value = get_value_impl(column_index);
+		auto res = boost::get<__int64>(&value);
+		if (nullptr == res)
+			throw std::runtime_error(__FUNCTION__ " Invalid value type!");
+
+		return boost::numeric_cast<int>(*res);
+	}
+
 	void statement::bind_value(const value_t& val, int index)
 	{
 		class value_binder : public boost::static_visitor<void>
@@ -176,6 +189,27 @@ namespace sqlite
 		// TODO: add result validation logic
 		::sqlite3_finalize(m_handle);
 		m_handle = nullptr;
+	}
+
+	//////////////////////////////////////////////////////////
+	// transaction impl
+
+	void transaction::commit()
+	{
+		m_commit->step();
+	}
+
+	void transaction::rollback()
+	{
+		m_rollback->step();
+	}
+
+	transaction::transaction(const connection::ptr& db)
+		: m_commit(db->create_statement(L"COMMIT TRANSACTION"))
+		, m_rollback(db->create_statement(L"ROLLBACK TRANSACTION"))
+	{
+		auto begin = db->create_statement(L"BEGIN TRANSACTION");
+		begin->step();
 	}
 
 	//////////////////////////////////////////////////////////

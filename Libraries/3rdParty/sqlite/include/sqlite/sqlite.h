@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/constrains.h>
+
 #include <boost/variant.hpp>
 
 #include <string>
@@ -13,7 +15,7 @@ namespace sqlite
 {
 	struct exception
 	{
-		int code;
+		const int code;
 		const std::wstring description;
 
 	public:
@@ -34,7 +36,7 @@ namespace sqlite
 
 	const vnull_t vnull;
 
-	class statement
+	class statement : noncopyable
 	{
 	public:
 		using ptr = std::shared_ptr<statement>;
@@ -68,7 +70,11 @@ namespace sqlite
 		~statement();
 	};
 
-	class connection 
+	// SB: special handling for int value
+	template<>
+	int statement::get_value(int column_index);
+
+	class connection : noncopyable
 	{
 	public:
 		using ptr = std::shared_ptr<connection>;
@@ -78,10 +84,25 @@ namespace sqlite
 
 	public:
 		statement::ptr create_statement(const std::wstring& query);
+
+	public:
 		static ptr create(const std::wstring& db_path);
 
 	public:
 		connection(const std::wstring& db_path);
 		~connection();
+	};
+
+	class transaction : noncopyable
+	{
+		const statement::ptr m_commit;
+		const statement::ptr m_rollback;
+
+	public:
+		void commit();
+		void rollback();
+
+	public:
+		transaction(const connection::ptr& db);
 	};
 }
