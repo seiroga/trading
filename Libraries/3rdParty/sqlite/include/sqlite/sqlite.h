@@ -83,7 +83,10 @@ namespace sqlite
 		sqlite3* m_handle;
 
 	public:
-		statement::ptr create_statement(const std::wstring& query);
+		statement::ptr create_statement(const std::wstring& query) const;
+		void set_synchronous(bool flag);
+		void set_schema_version(int ver);
+		int schema_version() const;
 
 	public:
 		static ptr create(const std::wstring& db_path);

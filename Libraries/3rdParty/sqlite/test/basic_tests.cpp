@@ -312,3 +312,41 @@ BOOST_FIXTURE_TEST_CASE(transactional, temp_dir_fixture)
 		BOOST_TEST(res);
 	}
 }
+
+BOOST_FIXTURE_TEST_CASE(synchronous, temp_dir_fixture)
+{
+	// INIT
+	basic_fixture::temp_folder tmp_folder;
+	const auto db_name = basic_fixture::unique_string();
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+
+	// ASSERT
+	BOOST_TEST(nullptr != db);
+
+	// ACT
+	db->set_synchronous(false);
+	db->set_synchronous(true);
+}
+
+BOOST_FIXTURE_TEST_CASE(schema_version, temp_dir_fixture)
+{
+	// INIT
+	basic_fixture::temp_folder tmp_folder;
+	const auto db_name = basic_fixture::unique_string();
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+
+	// ASSERT
+	BOOST_TEST(nullptr != db);
+
+	// ACT
+	db->set_schema_version(3);
+
+	// ASSERT
+	BOOST_TEST(db->schema_version() == 3);
+
+	// ACT
+	db->set_schema_version(1);
+
+	// ASSERT
+	BOOST_TEST(db->schema_version() == 1);
+}

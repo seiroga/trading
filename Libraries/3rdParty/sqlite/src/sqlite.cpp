@@ -3,6 +3,8 @@
 
 #include <boost/numeric/conversion/cast.hpp>
 
+#include <sstream>
+
 namespace sqlite
 {
 	namespace
@@ -215,9 +217,30 @@ namespace sqlite
 	//////////////////////////////////////////////////////////
 	// connection impl
 
-	statement::ptr connection::create_statement(const std::wstring& query)
+	statement::ptr connection::create_statement(const std::wstring& query) const
 	{
 		return std::make_shared<statement>(m_handle, query);
+	}
+
+	void connection::set_synchronous(bool flag)
+	{
+		auto st = create_statement(std::wstring(L"PRAGMA SYNCHRONOUS =") + (flag ? L"FULL" : L"OFF"));
+		st->step();
+	}
+
+	void connection::set_schema_version(int ver)
+	{
+		std::wstringstream ss;
+		ss << L"PRAGMA schema_version = " << ver;
+		auto st = create_statement(ss.str());
+		st->step();
+	}
+
+	int connection::schema_version() const
+	{
+		auto st = create_statement(L"PRAGMA schema_version");
+		st->step();
+		return st->get_value<int>(0);
 	}
 
 	connection::ptr connection::create(const std::wstring& db_path)
