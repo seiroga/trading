@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\3rdParty\boost\log\src\alignment_gap_between.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\attribute_set_impl.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\bit_tools.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\default_sink.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\id_formatting.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\murmur3.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\setup\default_filter_factory.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\setup\default_formatter_factory.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\setup\parser_utils.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\spirit_encoding.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\stateless_allocator.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\unique_ptr.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\windows\auto_handle.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\windows\event_log_registry.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\windows\ipc_sync_wrappers.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\windows\mapped_shared_memory.hpp" />
+    <ClInclude Include="..\3rdParty\boost\log\src\windows\utf_code_conversion.hpp" />
+    <ClInclude Include="include\logging\log.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\codecvt_error_category.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\operations.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\path.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\path_traits.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\portability.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\unique_path.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\utf8_codecvt_facet.cpp" />
+    <ClCompile Include="..\3rdParty\boost\filesystem\src\windows_file_codecvt.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\attribute_name.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\attribute_set.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\attribute_value_set.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\code_conversion.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\core.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\date_time_format_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\default_attribute_names.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\default_sink.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\dump.cpp" />
+    <None Include="..\3rdParty\boost\log\src\dump_avx2.cpp" />
+    <None Include="..\3rdParty\boost\log\src\dump_ssse3.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\event.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\exceptions.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\format_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\global_logger_storage.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\named_scope.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\named_scope_format_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\once_block.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\permissions.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\process_id.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\process_name.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\record_ostream.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\default_filter_factory.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\default_formatter_factory.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\filter_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\formatter_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\init_from_settings.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\init_from_stream.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\matches_relation_factory.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\parser_utils.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\setup\settings_parser.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\severity_level.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\spirit_encoding.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\syslog_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\text_file_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\text_multifile_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\text_ostream_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\threadsafe_queue.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\thread_id.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\thread_specific.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\timer.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\timestamp.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\trivial.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\unhandled_exception_count.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\debug_output_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\event_log_backend.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\ipc_reliable_message_queue.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\ipc_sync_wrappers.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\light_rw_mutex.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\mapped_shared_memory.cpp" />
+    <ClCompile Include="..\3rdParty\boost\log\src\windows\object_name.cpp" />
+    <ClCompile Include="..\3rdParty\boost\thread\src\future.cpp" />
+    <ClCompile Include="..\3rdParty\boost\thread\src\tss_null.cpp" />
+    <ClCompile Include="..\3rdParty\boost\thread\src\win32\thread.cpp" />
+    <ClCompile Include="..\3rdParty\boost\thread\src\win32\tss_dll.cpp" />
+    <ClCompile Include="..\3rdParty\boost\thread\src\win32\tss_pe.cpp" />
+    <ClCompile Include="log.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\3rdParty\boost\log\src\windows\simple_event_log.mc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{75FD1AF5-C6F2-41F2-B333-22117001124A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>logging</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Misc\Common\vcxprops\common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Misc\Common\vcxprops\common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Misc\Common\vcxprops\common.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Misc\Common\vcxprops\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjOutLibDir)</OutDir>
+    <IntDir>$(ProjIntDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjOutLibDir)</OutDir>
+    <IntDir>$(ProjIntDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjOutLibDir)</OutDir>
+    <IntDir>$(ProjIntDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(ProjOutLibDir)</OutDir>
+    <IntDir>$(ProjIntDir)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

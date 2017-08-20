@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win32", "..\..\Libraries\3r
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpprestsdk140.static", "..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\vs14.static\casablanca140.static.vcxproj", "{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\..\Libraries\logging\logging.vcxproj", "{75FD1AF5-C6F2-41F2-B333-22117001124A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
@@ -65,6 +67,16 @@ Global
 		{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A}.Release|x64.Build.0 = Release|x64
 		{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A}.Release|x86.ActiveCfg = Release|Win32
 		{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A}.Release|x86.Build.0 = Release|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Debug|ARM.ActiveCfg = Debug|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Debug|x64.ActiveCfg = Debug|x64
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Debug|x64.Build.0 = Debug|x64
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Debug|x86.ActiveCfg = Debug|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Debug|x86.Build.0 = Debug|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|ARM.ActiveCfg = Release|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x64.ActiveCfg = Release|x64
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x64.Build.0 = Release|x64
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x86.ActiveCfg = Release|Win32
+		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,5 +87,6 @@ Global
 		{594DCB5F-07E3-4084-A2CE-268611FA629F} = {D82656FF-7E3F-46F0-8CC0-E3E9D866280D}
 		{F40F4804-50F9-4257-8D74-B9CBB19AC4C3} = {D82656FF-7E3F-46F0-8CC0-E3E9D866280D}
 		{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A} = {D82656FF-7E3F-46F0-8CC0-E3E9D866280D}
+		{75FD1AF5-C6F2-41F2-B333-22117001124A} = {766B2294-A21B-477A-A402-82992456ABDA}
 	EndGlobalSection
 EndGlobal
