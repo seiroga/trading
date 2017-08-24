@@ -1,5 +1,7 @@
 #include <logging/log.h>
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
@@ -7,17 +9,23 @@
 #include <boost/log/sinks/text_ostream_backend.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/support/date_time.hpp>
 #include <boost/core/null_deleter.hpp>
 
 namespace logging
 {
+	namespace
+	{
+		const std::string log_entry_format_str = "[%TimeStamp%][P:%ProcessID%][T:%ThreadID%][%Severity%]: %Message%";
+	}
+
 	void init(level l, const std::wstring& path, bool replicate_on_cout)
 	{
 		boost::log::add_file_log
 		(
 			boost::log::keywords::file_name = path + L"log_%N.txt",
 			boost::log::keywords::rotation_size = 1 * 1024 * 1024,
-			boost::log::keywords::format = "[%TimeStamp%][P:%ProcessID%][T:%ThreadID%][%Severity%][L:%LineID%]: %Message%"
+			boost::log::keywords::format = log_entry_format_str
 		);
 
 		boost::log::add_common_attributes();
@@ -52,6 +60,15 @@ namespace logging
 		{
 			typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> text_sink;
 			boost::shared_ptr<text_sink> sink = boost::make_shared<text_sink>();
+			
+			sink->set_formatter
+			(
+				boost::log::expressions::stream << "[" << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f") << "]"
+				<< "[P:" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID") << "]"
+				<< "[T:" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID") << "]"
+				<< "[" << boost::log::expressions::attr< boost::log::trivial::severity_level >("Severity") << "]: "
+				<< boost::log::expressions::smessage
+			);
 
 			// We have to provide an empty deleter to avoid destroying the global stream object
 			boost::shared_ptr<std::ostream> std_cout_stream(&std::cout, boost::null_deleter());

@@ -17,12 +17,12 @@ std::wstring get_current_module_dir()
 		throw win::exception(L"GetModuleFileNameW call failed!");
 
 	std::wstring path(buf);
-	return path.substr(0, path.find_last_of(L"\\", 0) + 1);
+	return path.substr(0, path.find_last_of(L"\\"));
 }
 
 int wmain()
 {
-	logging::init(logging::level::debug, get_current_module_dir(), true);
+	logging::init(logging::level::debug, get_current_module_dir() + L"\\Logs\\", true);
 	
 	LOG_INFO << "Application started";
 	LOG_INFO << "Application shutdown";

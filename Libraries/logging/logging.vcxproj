@@ -188,6 +188,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -201,6 +202,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,6 +218,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -233,6 +236,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);BOOST_USE_WINDOWS_H;BOOST_LOG_WITHOUT_EVENT_LOG;SECURITY_WIN32;BOOST_LOG_WITHOUT_IPC;BOOST_LOG_NO_ASIO;BOOST_LOG_WITHOUT_SYSLOG;BOOST_LOG_USE_COMPILER_TLS;BOOST_THREAD_BUILD_LIB</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjRootDir)\Libraries\3rdParty;$(ProjRootDir)\Libraries\logging\include;$(ProjRootDir)\Libraries\3rdParty\boost\log\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
