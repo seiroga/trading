@@ -1,4 +1,5 @@
 #include <logging/log.h>
+#include <win/fs.h>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -21,9 +22,11 @@ namespace logging
 
 	void init(level l, const std::wstring& path, bool replicate_on_cout)
 	{
+		using win::fs::operator/;
+
 		boost::log::add_file_log
 		(
-			boost::log::keywords::file_name = path + L"log_%N.txt",
+			boost::log::keywords::file_name = path / L"log_%N.txt",
 			boost::log::keywords::rotation_size = 1 * 1024 * 1024,
 			boost::log::keywords::format = log_entry_format_str
 		);
@@ -66,7 +69,7 @@ namespace logging
 				boost::log::expressions::stream << "[" << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S.%f") << "]"
 				<< "[P:" << boost::log::expressions::attr<boost::log::attributes::current_process_id::value_type>("ProcessID") << "]"
 				<< "[T:" << boost::log::expressions::attr<boost::log::attributes::current_thread_id::value_type>("ThreadID") << "]"
-				<< "[" << boost::log::expressions::attr< boost::log::trivial::severity_level >("Severity") << "]: "
+				<< "[" << boost::log::expressions::attr<boost::log::trivial::severity_level>("Severity") << "]: "
 				<< boost::log::expressions::smessage
 			);
 

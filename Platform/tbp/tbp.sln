@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbp", "tbp.vcxproj", "{5646713D-6722-4BA4-BDCF-00A206AFFAB3}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpprestsdk140.static", "..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\vs14.static\casablanca140.static.vcxproj", "{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\..\Libraries\logging\logging.vcxproj", "{75FD1AF5-C6F2-41F2-B333-22117001124A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win", "..\..\Libraries\win\win.vcxproj", "{3817585F-2607-4FF7-997B-60228A93721F}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -77,6 +79,16 @@ Global
 		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x64.Build.0 = Release|x64
 		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x86.ActiveCfg = Release|Win32
 		{75FD1AF5-C6F2-41F2-B333-22117001124A}.Release|x86.Build.0 = Release|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Debug|ARM.ActiveCfg = Debug|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Debug|x64.ActiveCfg = Debug|x64
+		{3817585F-2607-4FF7-997B-60228A93721F}.Debug|x64.Build.0 = Debug|x64
+		{3817585F-2607-4FF7-997B-60228A93721F}.Debug|x86.ActiveCfg = Debug|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Debug|x86.Build.0 = Debug|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Release|ARM.ActiveCfg = Release|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x64.ActiveCfg = Release|x64
+		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x64.Build.0 = Release|x64
+		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x86.ActiveCfg = Release|Win32
+		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,5 +100,9 @@ Global
 		{F40F4804-50F9-4257-8D74-B9CBB19AC4C3} = {D82656FF-7E3F-46F0-8CC0-E3E9D866280D}
 		{79C9BBEC-D7C9-4BA3-B2B3-5C3A14A9F24A} = {D82656FF-7E3F-46F0-8CC0-E3E9D866280D}
 		{75FD1AF5-C6F2-41F2-B333-22117001124A} = {766B2294-A21B-477A-A402-82992456ABDA}
+		{3817585F-2607-4FF7-997B-60228A93721F} = {766B2294-A21B-477A-A402-82992456ABDA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8A79CB5-15C5-4F06-8811-1449545D63D0}
 	EndGlobalSection
 EndGlobal
