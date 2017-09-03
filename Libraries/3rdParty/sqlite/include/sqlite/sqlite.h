@@ -36,7 +36,7 @@ namespace sqlite
 
 	const vnull_t vnull;
 
-	class statement : noncopyable
+	class statement : sb::noncopyable
 	{
 	public:
 		using ptr = std::shared_ptr<statement>;
@@ -74,7 +74,7 @@ namespace sqlite
 	template<>
 	int statement::get_value(int column_index);
 
-	class connection : noncopyable
+	class connection : sb::noncopyable
 	{
 	public:
 		using ptr = std::shared_ptr<connection>;
@@ -96,7 +96,7 @@ namespace sqlite
 		~connection();
 	};
 
-	class transaction : noncopyable
+	class transaction : sb::noncopyable
 	{
 		const statement::ptr m_commit;
 		const statement::ptr m_rollback;

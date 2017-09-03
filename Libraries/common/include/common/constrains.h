@@ -1,9 +1,12 @@
 #pragma once
 
-struct noncopyable
+namespace sb
 {
-	noncopyable(const noncopyable&&) = delete;
-	noncopyable(const noncopyable&) = delete;
-	
-	noncopyable() = default;
-};
+	struct noncopyable
+	{
+		noncopyable(const noncopyable&&) = delete;
+		noncopyable(const noncopyable&) = delete;
+
+		noncopyable() = default;
+	};
+}

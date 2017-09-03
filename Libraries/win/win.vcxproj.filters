@@ -14,9 +14,18 @@
     <ClCompile Include="fs.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="thread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\win\fs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\win\thread.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\win\handle.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

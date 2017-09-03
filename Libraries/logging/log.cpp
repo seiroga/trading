@@ -24,6 +24,7 @@ namespace logging
 	{
 		using win::fs::operator/;
 
+		// SB: severity didn't shown in the log file ????
 		boost::log::add_file_log
 		(
 			boost::log::keywords::file_name = path / L"log_%N.txt",
@@ -80,5 +81,7 @@ namespace logging
 			// Register the sink in the logging core
 			boost::log::core::get()->add_sink(sink);
 		}
+
+		LOG_INFO << L"Logging subsystem has been initialized successfuly!";
 	}
 }
