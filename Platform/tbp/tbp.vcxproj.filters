@@ -21,9 +21,6 @@
     <ClCompile Include="src\tbp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\oanda_impl\data_collector.cpp">
-      <Filter>src\oanda_impl</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\tbp\connector.h">
@@ -34,9 +31,6 @@
     </ClInclude>
     <ClInclude Include="include\tbp\primitives.h">
       <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\oanda_impl\data_collector.h">
-      <Filter>src\oanda_impl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
