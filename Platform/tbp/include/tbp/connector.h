@@ -2,13 +2,15 @@
 
 #include <tbp/primitives.h>
 
+#include <common/constrains.h>
+
 #include <string>
 #include <vector>
 #include <memory>
 
 namespace tbp
 {
-	struct order
+	struct order : sb::dynamic
 	{
 		using ptr = std::shared_ptr<order>;
 
@@ -17,7 +19,7 @@ namespace tbp
 		virtual void cancel() = 0;
 	};
 
-	class connector
+	class connector : sb::dynamic
 	{
 	public:
 		using ptr = std::shared_ptr<connector>;

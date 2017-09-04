@@ -13,12 +13,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="src\oanda_impl">
-      <UniqueIdentifier>{eb7fb674-f044-4728-b6a3-3e2971e952a3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\tbp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data_collector_impl.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="include\tbp\primitives.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\data_collector_impl.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

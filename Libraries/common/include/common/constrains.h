@@ -9,4 +9,11 @@ namespace sb
 
 		noncopyable() = default;
 	};
+
+	struct dynamic
+	{
+		virtual ~dynamic()
+		{
+		}
+	};
 }

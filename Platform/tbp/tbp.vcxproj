@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\data_collector_impl.cpp" />
     <ClCompile Include="src\tbp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +40,7 @@
     <ClInclude Include="include\tbp\connector.h" />
     <ClInclude Include="include\tbp\data_collector.h" />
     <ClInclude Include="include\tbp\primitives.h" />
+    <ClInclude Include="src\data_collector_impl.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
