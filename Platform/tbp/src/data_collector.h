@@ -1,9 +1,7 @@
 #pragma once
 
-#include <tbp/data_collector.h>
+#include <tbp/data_storage.h>
 #include <tbp/connector.h>
-
-#include <sqlite/sqlite.h>
 
 #include<win/thread.h>
 
@@ -12,7 +10,7 @@
 
 namespace tbp
 {
-	class data_collector_impl : public tbp::data_collector
+	class data_collector
 	{
 		win::event m_start_evt;
 		win::event m_stop_evt;
@@ -25,10 +23,7 @@ namespace tbp
 		void collect_data_thread();
 
 	public:
-		virtual data_provider::ptr get_data_provider() override;
-
-	public:
-		data_collector_impl(const std::wstring& instrument_id, const tbp::connector::ptr& connector, const data_storage::ptr& ds);
-		~data_collector_impl();
+		data_collector(const std::wstring& instrument_id, const tbp::connector::ptr& connector, const data_storage::ptr& ds);
+		~data_collector();
 	};
 }

@@ -18,7 +18,7 @@
     <ClCompile Include="src\tbp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\data_collector_impl.cpp">
+    <ClCompile Include="src\data_collector.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,13 +26,13 @@
     <ClInclude Include="include\tbp\connector.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\tbp\data_collector.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="include\tbp\primitives.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="src\data_collector_impl.h">
+    <ClInclude Include="include\tbp\data_storage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\data_collector.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

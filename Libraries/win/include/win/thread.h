@@ -62,7 +62,7 @@ namespace win
 	template<typename T, typename ...args_t>
 	std::vector<HANDLE> get_args(const T& arg, const args_t&... args)
 	{
-		std::vector<HANDLE> res(sizeof...(args) + 1, nullptr);
+		std::vector<HANDLE> res;
 		get_args_impl(res, arg, args...);
 
 		return res;

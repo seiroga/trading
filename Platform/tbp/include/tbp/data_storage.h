@@ -26,10 +26,4 @@ namespace tbp
 	public:
 		virtual void save_instrument_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) = 0;
 	};
-
-	struct data_collector : sb::dynamic
-	{
-	public:
-		virtual data_provider::ptr get_data_provider() = 0;
-	};
 }

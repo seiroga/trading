@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "..\..\Libraries\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "win", "..\..\Libraries\win\win.vcxproj", "{3817585F-2607-4FF7-997B-60228A93721F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbp.test", "tbp.test\tbp.test.vcxproj", "{EF05F735-3EAF-4C36-A34E-6BBC17843942}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
@@ -89,6 +91,16 @@ Global
 		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x64.Build.0 = Release|x64
 		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x86.ActiveCfg = Release|Win32
 		{3817585F-2607-4FF7-997B-60228A93721F}.Release|x86.Build.0 = Release|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Debug|ARM.ActiveCfg = Debug|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Debug|x64.ActiveCfg = Debug|x64
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Debug|x64.Build.0 = Debug|x64
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Debug|x86.ActiveCfg = Debug|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Debug|x86.Build.0 = Debug|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|ARM.ActiveCfg = Release|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x64.ActiveCfg = Release|x64
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x64.Build.0 = Release|x64
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x86.ActiveCfg = Release|Win32
+		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

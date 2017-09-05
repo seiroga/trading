@@ -7,7 +7,7 @@ namespace win
 
 	bool event::wait(unsigned long timeout)
 	{
-		return ::WaitForSingleObject(value, timeout);
+		return WAIT_OBJECT_0 == ::WaitForSingleObject(value, timeout);
 	}
 
 	void event::set()
