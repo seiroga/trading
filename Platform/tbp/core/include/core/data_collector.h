@@ -1,7 +1,7 @@
 #pragma once
 
-#include <tbp/data_storage.h>
-#include <tbp/connector.h>
+#include <core/data_storage.h>
+#include <core/connector.h>
 
 #include<win/thread.h>
 

@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="src\units_to_test">
-      <UniqueIdentifier>{3f2acd39-5bbd-4934-b0d0-0e5c6dbb28c6}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -21,9 +18,6 @@
   <ItemGroup>
     <ClCompile Include="test_data_collector.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\data_collector.cpp">
-      <Filter>src\units_to_test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\data_collector.cpp" />
     <ClCompile Include="src\tbp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -35,12 +34,9 @@
     <ProjectReference Include="..\..\Libraries\win\win.vcxproj">
       <Project>{3817585f-2607-4ff7-997b-60228a93721f}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\tbp\connector.h" />
-    <ClInclude Include="include\tbp\data_storage.h" />
-    <ClInclude Include="include\tbp\primitives.h" />
-    <ClInclude Include="src\data_collector.h" />
+    <ProjectReference Include="core\tbp.core.vcxproj">
+      <Project>{69c605b8-50d7-4e55-9ccb-398d2d8c38f9}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -124,7 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -139,7 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -156,7 +152,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -175,7 +171,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;.\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\logging\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
