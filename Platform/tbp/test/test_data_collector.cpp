@@ -57,7 +57,7 @@ namespace
 	};
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_start_stop)
+BOOST_AUTO_TEST_CASE(data_collector_process_data)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
@@ -77,4 +77,17 @@ BOOST_AUTO_TEST_CASE(data_collector_start_stop)
 	{
 		BOOST_ASSERT(val == conn->value);
 	}
+}
+
+BOOST_AUTO_TEST_CASE(data_collector_create_delete)
+{
+	// INIT
+	auto ds = std::make_shared<mock_data_storage>();
+	auto conn = std::make_shared<mock_connector>();
+	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
+	conn->value = std::make_shared<tbp::data_t>(mock_data);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+
+	// ACT (no deadlock)
+	dc.reset();
 }

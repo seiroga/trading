@@ -164,9 +164,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="test_data_collector.cpp" />
   </ItemGroup>
   <ItemGroup>
