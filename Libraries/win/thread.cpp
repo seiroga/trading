@@ -43,4 +43,34 @@ namespace win
 			throw win::exception(L"CreateEvent call failed!");
 		}
 	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// mrsw_lock implementation
+
+	bool mrsw_lock::try_lock(acquire_mode_t mode)
+	{
+		auto acquire_func_ptr = acquire_mode_t::exlusive == mode ? &::TryAcquireSRWLockExclusive : &::TryAcquireSRWLockShared;
+		return 0 == acquire_func_ptr(&m_handle);
+	}
+
+	void mrsw_lock::lock(acquire_mode_t mode)
+	{
+		auto acquire_func_ptr = acquire_mode_t::exlusive == mode ? &::AcquireSRWLockExclusive : &::AcquireSRWLockShared;
+		acquire_func_ptr(&m_handle);
+	}
+
+	void mrsw_lock::unlock(acquire_mode_t mode)
+	{
+		auto acquire_func_ptr = acquire_mode_t::exlusive == mode ? &::ReleaseSRWLockExclusive : &::ReleaseSRWLockShared;
+		acquire_func_ptr(&m_handle);
+	}
+
+	mrsw_lock::mrsw_lock()
+		: m_handle(SRWLOCK_INIT)
+	{
+	}
+
+	mrsw_lock::~mrsw_lock()
+	{
+	}
 }

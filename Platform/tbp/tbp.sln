@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbp.core", "core\tbp.core.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbp.test", "test\tbp.test.vcxproj", "{EF05F735-3EAF-4C36-A34E-6BBC17843942}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oanda", "oanda\oanda.vcxproj", "{1D7A0429-F132-480B-B994-E2181FC8D228}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
@@ -113,6 +115,16 @@ Global
 		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x64.Build.0 = Release|x64
 		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x86.ActiveCfg = Release|Win32
 		{EF05F735-3EAF-4C36-A34E-6BBC17843942}.Release|x86.Build.0 = Release|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Debug|ARM.ActiveCfg = Debug|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Debug|x64.ActiveCfg = Debug|x64
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Debug|x64.Build.0 = Debug|x64
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Debug|x86.ActiveCfg = Debug|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Debug|x86.Build.0 = Debug|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Release|ARM.ActiveCfg = Release|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Release|x64.ActiveCfg = Release|x64
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Release|x64.Build.0 = Release|x64
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Release|x86.ActiveCfg = Release|Win32
+		{1D7A0429-F132-480B-B994-E2181FC8D228}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

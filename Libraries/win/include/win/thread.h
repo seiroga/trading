@@ -114,4 +114,46 @@ namespace win
 		event(const std::wstring& name, bool manual_reset, bool initial_state);
 		event(bool manual_reset, bool initial_state);
 	};
+
+	///////////////////////////////////////////////////////////////////////////////////
+	//// crirical_section
+
+	//class critical_section : public common_handle, public waitable, public lockable
+	//{
+	//public:
+	//	virtual bool wait(unsigned long timeout) override;
+
+	//public:
+	//	virtual bool try_lock() override;
+	//	virtual void lock() override;
+	//	virtual void unlock() override;
+
+	//public:
+	//	critical_section();
+	//};
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// crirical_section
+
+	class mrsw_lock
+	{
+	public:
+		enum class acquire_mode_t
+		{
+			shared,
+			exlusive
+		};
+
+	private:
+		SRWLOCK m_handle;
+
+	public:
+		bool try_lock(acquire_mode_t mode);
+		void lock(acquire_mode_t mode);
+		void unlock(acquire_mode_t mode);
+
+	public:
+		mrsw_lock();
+		~mrsw_lock();
+	};
 }
