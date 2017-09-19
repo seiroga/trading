@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\setup">
+      <UniqueIdentifier>{332af01d-7d91-4951-a398-ed5b18475161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\windows">
+      <UniqueIdentifier>{ef5434aa-b863-4594-837d-0f26efac87b3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\boost\log\src\alignment_gap_between.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\attribute_set_impl.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\bit_tools.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\default_sink.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\id_formatting.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\murmur3.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\spirit_encoding.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\stateless_allocator.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\boost\log\src\unique_ptr.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\boost\log\src\attribute_name.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\attribute_set.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\attribute_value_set.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\code_conversion.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\core.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\date_time_format_parser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\default_attribute_names.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\default_sink.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\dump.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\event.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\exceptions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\format_parser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\global_logger_storage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\named_scope.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\named_scope_format_parser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\once_block.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\permissions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\process_id.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\process_name.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\record_ostream.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\severity_level.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\spirit_encoding.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\syslog_backend.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\text_file_backend.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\text_multifile_backend.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\text_ostream_backend.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\thread_id.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\thread_specific.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\threadsafe_queue.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\timer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\timestamp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\trivial.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\unhandled_exception_count.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\debug_output_backend.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\event_log_backend.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\ipc_reliable_message_queue.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\ipc_sync_wrappers.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\light_rw_mutex.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\mapped_shared_memory.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\windows\object_name.cpp">
+      <Filter>src\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\default_filter_factory.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\default_formatter_factory.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\filter_parser.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\formatter_parser.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\init_from_settings.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\init_from_stream.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\matches_relation_factory.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\parser_utils.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\boost\log\src\setup\settings_parser.cpp">
+      <Filter>src\setup</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

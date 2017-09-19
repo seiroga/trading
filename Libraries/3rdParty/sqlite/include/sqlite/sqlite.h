@@ -65,6 +65,8 @@ namespace sqlite
 
 		void bind_value(const value_t& val, int index);
 
+		__int64 last_insert_row_id() const;
+
 	public:
 		statement(sqlite3* db_handle, const std::wstring& query);
 		~statement();

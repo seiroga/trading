@@ -7,6 +7,25 @@ namespace tbp
 {
 	namespace oanda
 	{
+		namespace values
+		{
+			namespace instrument_data
+			{
+				extern const std::wstring c_timestamp;
+				extern const std::wstring c_volume;
+				extern const std::wstring c_bid_candlestick;
+				extern const std::wstring c_ask_candlestick;
+			}
+
+			namespace candlestick_data
+			{
+				extern const std::wstring c_open_price;
+				extern const std::wstring c_high_price;
+				extern const std::wstring c_low_price;
+				extern const std::wstring c_close_price;
+			}
+		}
+
 		class data_storage : public tbp::data_storage
 		{
 			const sqlite::connection::ptr m_db;

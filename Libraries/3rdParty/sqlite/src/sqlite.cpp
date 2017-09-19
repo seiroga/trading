@@ -180,6 +180,11 @@ namespace sqlite
 		val.apply_visitor(value_binder(m_db_handle, m_handle, index));
 	}
 
+	__int64 statement::last_insert_row_id() const
+	{
+		return sqlite3_last_insert_rowid(m_db_handle);
+	}
+
 	statement::statement(sqlite3* db_handle, const std::wstring& query)
 		: m_db_handle(db_handle)
 		, m_handle(prepare_statement(db_handle, query))

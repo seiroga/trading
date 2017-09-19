@@ -1,6 +1,4 @@
-#define BOOST_TEST_MODULE TBP Tests
-
-#include <boost/test/included/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <core/data_collector.h>
 

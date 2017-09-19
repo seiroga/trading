@@ -80,22 +80,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
@@ -104,7 +104,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -118,7 +118,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -134,7 +134,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -152,7 +152,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -164,14 +164,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="oanda\test_data_storage.cpp" />
     <ClCompile Include="test_data_collector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\3rdParty\boost_libs\filesystem\filesystem.vcxproj">
+      <Project>{91d778b4-7224-44f0-84db-3b2f3061ed66}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\3rdParty\boost_libs\log\log.vcxproj">
+      <Project>{e8559d17-860e-4446-9b23-2339c784780f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\3rdParty\boost_libs\test\test.vcxproj">
+      <Project>{2ffc6458-0b7a-4bee-aeaf-0301c27216f4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\3rdParty\boost_libs\thread\thread.vcxproj">
+      <Project>{d16c9df5-0a70-4472-a0e6-e27b4826456d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\3rdParty\sqlite\sqlite.vcxproj">
+      <Project>{dca18716-e7f0-41ba-a2b4-431049501a28}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\logging\logging.vcxproj">
+      <Project>{75fd1af5-c6f2-41f2-b333-22117001124a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\win\win.vcxproj">
       <Project>{3817585f-2607-4ff7-997b-60228a93721f}</Project>
     </ProjectReference>
     <ProjectReference Include="..\core\tbp.core.vcxproj">
       <Project>{69c605b8-50d7-4e55-9ccb-398d2d8c38f9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\oanda\oanda.vcxproj">
+      <Project>{1d7a0429-f132-480b-b994-e2181fc8d228}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

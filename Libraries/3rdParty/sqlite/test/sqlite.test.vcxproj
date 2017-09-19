@@ -159,6 +159,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\boost_libs\test\test.vcxproj">
+      <Project>{2ffc6458-0b7a-4bee-aeaf-0301c27216f4}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\sqlite.vcxproj">
       <Project>{dca18716-e7f0-41ba-a2b4-431049501a28}</Project>
     </ProjectReference>
