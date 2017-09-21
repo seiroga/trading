@@ -104,7 +104,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -118,7 +118,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -134,7 +134,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -152,7 +152,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -183,6 +183,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\3rdParty\sqlite\sqlite.vcxproj">
       <Project>{dca18716-e7f0-41ba-a2b4-431049501a28}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\common\test_helpers\test_helpers.vcxproj">
+      <Project>{75fb6708-6016-43a5-98b4-1419e098bd37}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\logging\logging.vcxproj">
       <Project>{75fd1af5-c6f2-41f2-b333-22117001124a}</Project>
