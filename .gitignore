@@ -1,0 +1,11 @@
+*.VC.db*
+*.VC.opendb*
+*.suo
+**.vs
+*.vcxproj.user
+**x64
+**x86
+**x00
+**packages
+**/cpprest_internal/Binaries
+**/cpprest_internal/Intermediate
