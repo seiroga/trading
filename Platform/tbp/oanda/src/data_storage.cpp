@@ -43,6 +43,8 @@ namespace tbp
 
 		void data_storage::create_db_schema()
 		{
+			sqlite::transaction t(m_db);
+
 			const auto version = m_db->schema_version();
 			switch (version)
 			{
@@ -58,11 +60,18 @@ namespace tbp
 
 			LOG_INFO << "Oanda data storage DB schema is empty. Creating DB chema!";
 
-			m_db->create_statement(L"CREATE TABLE INSTRUMENTS(ID INTEGER PRIMARY KEY NOT NULL, NAME TEXT)");
-			m_db->create_statement(L"CREATE TABLE CANDLES(ID INTEGER PRIMARY KEY NOT NULL, O_PRICE REAL, H_PRICE REAL, L_PRICE REAL, C_PRICE REAL)");
-			m_db->create_statement(L"CREATE TABLE INSTRUMENT_DATA(INSTRUMENT_ID INTEGER, TIMESTAMP INTEGER, BID_CANDLESTICK_ROW_ID INTEGER, ASK_CANDLESTICK_ROW_ID INTEGER, VOLUME INTEGER, INSTRUMENT_ID REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE)");
+			auto st = m_db->create_statement(L"CREATE TABLE [INSTRUMENTS]([ID] INTEGER PRIMARY KEY NOT NULL, [NAME] TEXT)");
+			st->step();
+
+			st = m_db->create_statement(L"CREATE TABLE [CANDLES]([ID] INTEGER PRIMARY KEY NOT NULL, [O_PRICE] DOUBLE, [H_PRICE] DOUBLE, [L_PRICE] DOUBLE, [C_PRICE] DOUBLE)");
+			st->step();
+
+			st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER)");
+			st->step();
 
 			m_db->set_schema_version(current_schema_version);
+
+			t.commit();
 
 			LOG_INFO << "Oanda data storage DB schema has been created successfully!";
 		}
@@ -77,7 +86,7 @@ namespace tbp
 			auto st = m_db->create_statement(LR"(
 				SELECT TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME 
 					FROM INSTRUMENT_DATA 
-					WHERE INSTRUMENT_DATA.ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP => ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 )");
+					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 )");
 
 			st->bind_value(instrument_id, 1);
 			st->bind_value(start_datetime.time_since_epoch().count(), 2);
@@ -85,14 +94,14 @@ namespace tbp
 
 			auto candels_data_st = m_db->create_statement(LR"(
 				SELECT O_PRICE, H_PRICE, L_PRICE, C_PRICE 
-					FROM CANDELS 
-					WHERE CANDLES.ID = ?1 )");
+					FROM CANDLES 
+					WHERE ID = ?1 )");
 
 			std::vector<data_t::ptr> result;
 			while (st->step())
 			{
 				tbp::data_t record;
-				record[L"TIMESTAMP"] = st->get_value<__int64>(0);
+				record[L"TIMESTAMP"] = tbp::time_t(tbp::time_t::duration(st->get_value<__int64>(0)));
 				record[L"VOLUME"] = st->get_value<__int64>(3);
 
 				candels_data_st->reset();
@@ -136,11 +145,14 @@ namespace tbp
 					instrument_row_id = insert_instrument_st->last_insert_row_id();
 				}
 
-				auto insert_candle_data_st = m_db->create_statement(L"INSERT INTO CANDLES(O_PRICE REAL, H_PRICE REAL, L_PRICE REAL, C_PRICE REAL) VALUES (?1, ?2, ?3, ?4)");
+				auto insert_candle_data_st = m_db->create_statement(L"INSERT INTO CANDLES(O_PRICE, H_PRICE, L_PRICE, C_PRICE) VALUES (?1, ?2, ?3, ?4)");
 				auto insert_instrument_data_st = m_db->create_statement(L"INSERT INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5)");
 				for (const auto& instrument_data : data)
 				{
+					insert_instrument_data_st->reset();
 					insert_instrument_data_st->bind_value(instrument_row_id, 1);
+
+					insert_candle_data_st->reset();
 
 					// TIMESTAMP
 					{
@@ -153,56 +165,23 @@ namespace tbp
 						insert_instrument_data_st->bind_value(boost::get<tbp::time_t>(it->second).time_since_epoch().count(), 2);
 					}
 
-					// BID_CANDLESTICK
+					std::wstring candlestick_values[] =
 					{
-						auto it = instrument_data->find(values::instrument_data::c_bid_candlestick);
+						values::candlestick_data::c_open_price,
+						values::candlestick_data::c_high_price,
+						values::candlestick_data::c_low_price,
+						values::candlestick_data::c_close_price,
+					};
+
+					auto save_candlestick_data = [&](const std::wstring& candlestick_name, int st_index)
+					{
+						auto it = instrument_data->find(candlestick_name);
 						if (instrument_data->end() == it)
 						{
-							throw std::runtime_error("BID_CANDLESTICK value isn't provided by instrument data!");
+							throw std::runtime_error("Candlestick value isn't provided by instrument data!");
 						}
 
 						const auto& candelstick_data = boost::get<tbp::data_t>(it->second);
-						std::wstring candlestick_values[] =
-						{
-							values::candlestick_data::c_open_price,
-							values::candlestick_data::c_high_price,
-							values::candlestick_data::c_low_price,
-							values::candlestick_data::c_close_price,
-						};
-
-						int index = 1;
-						for (const auto& value_name : candlestick_values)
-						{
-							auto it = candelstick_data.find(value_name);
-							if (candelstick_data.end() == it)
-							{
-								throw std::runtime_error("Candlestick data incomplete!");
-							}
-
-							insert_candle_data_st->bind_value(boost::get<double>(it->second), index++);
-						}
-
-						insert_candle_data_st->step();
-
-						insert_instrument_data_st->bind_value(insert_candle_data_st->last_insert_row_id(), 3);
-					}
-
-					// ASK_CANDLESTICK
-					{
-						auto it = instrument_data->find(values::instrument_data::c_ask_candlestick);
-						if (instrument_data->end() == it)
-						{
-							throw std::runtime_error("BID_CANDLESTICK value isn't provided by instrument data!");
-						}
-
-						const auto& candelstick_data = boost::get<tbp::data_t>(it->second);
-						std::wstring candlestick_values[] =
-						{
-							values::candlestick_data::c_open_price,
-							values::candlestick_data::c_high_price,
-							values::candlestick_data::c_low_price,
-							values::candlestick_data::c_close_price,
-						};
 
 						insert_candle_data_st->reset();
 
@@ -220,8 +199,14 @@ namespace tbp
 
 						insert_candle_data_st->step();
 
-						insert_instrument_data_st->bind_value(insert_candle_data_st->last_insert_row_id(), 4);
-					}
+						insert_instrument_data_st->bind_value(insert_candle_data_st->last_insert_row_id(), st_index);
+					};
+
+					// BID_CANDLESTICK
+					save_candlestick_data(values::instrument_data::c_bid_candlestick, 3);
+
+					// ASK_CANDLESTICK
+					save_candlestick_data(values::instrument_data::c_ask_candlestick, 4);
 
 					// VOLUME
 					{
@@ -235,9 +220,9 @@ namespace tbp
 					}
 
 					insert_instrument_data_st->step();
-
-					t.commit();
 				}
+
+				t.commit();
 			}
 			catch (...)
 			{

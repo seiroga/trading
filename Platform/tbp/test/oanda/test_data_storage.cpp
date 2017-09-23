@@ -8,6 +8,8 @@
 #include <functional>
 #include <random>
 
+#include <windows.h>
+
 namespace
 {
 	struct common_fixture : test_helpers::temp_dir_fixture
@@ -51,6 +53,8 @@ namespace
 			{
 				tbp::data_t instrument_data;
 
+				::Sleep(100);
+
 				instrument_data[tbp::oanda::values::instrument_data::c_timestamp] = std::chrono::system_clock::now();
 				instrument_data[tbp::oanda::values::instrument_data::c_volume] = __int64(rand());
 
@@ -60,6 +64,27 @@ namespace
 
 				return std::make_shared<tbp::data_t>(std::move(instrument_data));
 			});
+
+			return result;
+		}
+
+		bool is_equal(const std::vector<tbp::data_t::ptr>& lhs, const std::vector<tbp::data_t::ptr>& rhs)
+		{
+			if (lhs.size() != rhs.size())
+			{
+				return false;
+			}
+
+			size_t index = 0;
+			for (const auto& lhs_data_item : lhs)
+			{
+				if (*lhs_data_item != *rhs[index++])
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 	};
 }
@@ -67,16 +92,20 @@ namespace
 BOOST_FIXTURE_TEST_CASE(save_data, common_fixture)
 {
 	// INIT (generate data)
+	const auto instrument_id = L"instrument1";
+	temp_folder tmp_folder;
+	const auto db_name = unique_string();
+	const auto start_time = std::chrono::system_clock::now();
 	auto instrument_data = generate_data(100);
+	const auto end_time = std::chrono::system_clock::now();
 
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+	tbp::oanda::data_storage ds(db);
 
-	tbp::oanda::data_storage ds();
+	// ACT
+	ds.save_instrument_data(instrument_id, instrument_data);
+	auto data = ds.get_instrument_data(instrument_id, start_time, end_time);
 
-	//// ASSERT
-	//BOOST_ASSERT(data_arrived);
-	//BOOST_ASSERT(ds->values.size() > 0);
-	//for (auto& val : ds->values)
-	//{
-	//	BOOST_ASSERT(val == conn->value);
-	//}
+	// ASSERT
+	BOOST_ASSERT(is_equal(data, instrument_data));
 }

@@ -38,7 +38,7 @@ namespace
 	{
 		tbp::data_t::ptr value;
 
-		virtual std::vector<std::wstring> get_available_instruments() const override
+		virtual std::vector<std::wstring> get_instruments() const override
 		{
 			return { L"" };
 		}
