@@ -66,7 +66,7 @@ namespace tbp
 			st = m_db->create_statement(L"CREATE TABLE [CANDLES]([ID] INTEGER PRIMARY KEY NOT NULL, [O_PRICE] DOUBLE, [H_PRICE] DOUBLE, [L_PRICE] DOUBLE, [C_PRICE] DOUBLE)");
 			st->step();
 
-			st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER)");
+			st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
 			st->step();
 
 			m_db->set_schema_version(current_schema_version);
@@ -146,7 +146,7 @@ namespace tbp
 				}
 
 				auto insert_candle_data_st = m_db->create_statement(L"INSERT INTO CANDLES(O_PRICE, H_PRICE, L_PRICE, C_PRICE) VALUES (?1, ?2, ?3, ?4)");
-				auto insert_instrument_data_st = m_db->create_statement(L"INSERT INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5)");
+				auto insert_instrument_data_st = m_db->create_statement(L"INSERT OR REPLACE INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5)");
 				for (const auto& instrument_data : data)
 				{
 					insert_instrument_data_st->reset();

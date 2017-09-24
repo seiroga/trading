@@ -16,19 +16,20 @@ namespace
 	{
 		std::random_device rand;
 
-		double generate_double(long max_value = 1000)
+		template<typename T>
+		T generate(long max_value = 1000)
 		{
 			return rand() % max_value;
 		}
 
 		auto generate_fractional_part()
 		{
-			return double((rand() % 1000) / 1000.0);
+			return generate<double>() / 1000.0;
 		};
 
 		auto generate_delta(long max_value = 100)
 		{
-			return double(rand() % max_value) + generate_fractional_part();
+			return generate<double>(max_value) + generate_fractional_part();
 		};
 
 		tbp::data_t generate_candle(double value)
@@ -58,7 +59,7 @@ namespace
 				instrument_data[tbp::oanda::values::instrument_data::c_timestamp] = std::chrono::system_clock::now();
 				instrument_data[tbp::oanda::values::instrument_data::c_volume] = __int64(rand());
 
-				auto ask_price = generate_double();
+				auto ask_price = generate<double>();
 				instrument_data[tbp::oanda::values::instrument_data::c_ask_candlestick] = generate_candle(ask_price);
 				instrument_data[tbp::oanda::values::instrument_data::c_bid_candlestick] = generate_candle(ask_price - generate_delta());
 
@@ -105,6 +106,40 @@ BOOST_FIXTURE_TEST_CASE(save_data, common_fixture)
 	// ACT
 	ds.save_instrument_data(instrument_id, instrument_data);
 	auto data = ds.get_instrument_data(instrument_id, start_time, end_time);
+
+	// ASSERT
+	BOOST_ASSERT(is_equal(data, instrument_data));
+}
+
+BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
+{
+	// INIT (generate data)
+	const auto instrument_id = L"instrument1";
+	temp_folder tmp_folder;
+	const auto db_name = unique_string();
+	const auto start_time = std::chrono::system_clock::now();
+	auto instrument_data = generate_data(100);
+	const auto end_time = std::chrono::system_clock::now();
+
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+	tbp::oanda::data_storage ds(db);
+
+	// ACT
+	ds.save_instrument_data(instrument_id, instrument_data);
+	auto data = ds.get_instrument_data(instrument_id, start_time, end_time);
+
+	// ASSERT
+	BOOST_ASSERT(is_equal(data, instrument_data));
+
+	// INIT
+	const auto index = generate<size_t>(99);
+	const auto ask_price = generate<double>();
+	(*instrument_data[index])[tbp::oanda::values::instrument_data::c_ask_candlestick] = generate_candle(ask_price);
+	(*instrument_data[index])[tbp::oanda::values::instrument_data::c_bid_candlestick] = generate_candle(ask_price - generate_delta());
+
+	// ACT
+	ds.save_instrument_data(instrument_id, instrument_data);
+	data = ds.get_instrument_data(instrument_id, start_time, end_time);
 
 	// ASSERT
 	BOOST_ASSERT(is_equal(data, instrument_data));
