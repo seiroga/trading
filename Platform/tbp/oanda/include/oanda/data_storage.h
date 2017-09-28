@@ -35,7 +35,7 @@ namespace tbp
 			void verify_db_schema();
 
 		public:
-			virtual std::vector<data_t::ptr> get_instrument_data(const std::wstring& instrument_id, time_t start_datetime, time_t end_datetime) override;
+			virtual std::vector<data_t::ptr> get_instrument_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
 			virtual void save_instrument_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
 
 		public:

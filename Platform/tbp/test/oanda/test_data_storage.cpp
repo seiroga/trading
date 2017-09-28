@@ -54,7 +54,7 @@ namespace
 			{
 				tbp::data_t instrument_data;
 
-				::Sleep(100);
+				::Sleep(10);
 
 				instrument_data[tbp::oanda::values::instrument_data::c_timestamp] = std::chrono::system_clock::now();
 				instrument_data[tbp::oanda::values::instrument_data::c_volume] = __int64(rand());
@@ -87,6 +87,17 @@ namespace
 
 			return true;
 		}
+
+		tbp::time_t get_timestamp(const tbp::data_t::ptr& data)
+		{
+			auto it = data->find(tbp::oanda::values::instrument_data::c_timestamp);
+			if (data->end() == it)
+			{
+				throw std::runtime_error("Test candlestick data is corrupted!");
+			}
+
+			return tbp::get<tbp::time_t>(it->second);
+		}
 	};
 }
 
@@ -96,22 +107,24 @@ BOOST_FIXTURE_TEST_CASE(save_data, common_fixture)
 	const auto instrument_id = L"instrument1";
 	temp_folder tmp_folder;
 	const auto db_name = unique_string();
-	const auto start_time = std::chrono::system_clock::now();
+	auto start_time = std::chrono::system_clock::now();
 	auto instrument_data = generate_data(100);
-	const auto end_time = std::chrono::system_clock::now();
+	auto end_time = std::chrono::system_clock::now();
 
 	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
 	tbp::oanda::data_storage ds(db);
 
 	// ACT
 	ds.save_instrument_data(instrument_id, instrument_data);
-	auto data = ds.get_instrument_data(instrument_id, start_time, end_time);
+	auto data = ds.get_instrument_data(instrument_id, &start_time, &end_time);
 
 	// ASSERT
+	BOOST_ASSERT(start_time == get_timestamp(*data.begin()));
+	BOOST_ASSERT(end_time == get_timestamp(*data.rbegin()));
 	BOOST_ASSERT(is_equal(data, instrument_data));
 }
 
-BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
+BOOST_FIXTURE_TEST_CASE(get_data, common_fixture)
 {
 	// INIT (generate data)
 	const auto instrument_id = L"instrument1";
@@ -126,7 +139,32 @@ BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
 
 	// ACT
 	ds.save_instrument_data(instrument_id, instrument_data);
-	auto data = ds.get_instrument_data(instrument_id, start_time, end_time);
+	auto start_time2 = get_timestamp(instrument_data[10]);
+	auto end_time2 = get_timestamp(instrument_data[50]);
+	auto data = ds.get_instrument_data(instrument_id, &start_time2, &end_time2);
+
+	// ASSERT
+	BOOST_ASSERT(start_time2 == get_timestamp(instrument_data[10]));
+	BOOST_ASSERT(end_time2 == get_timestamp(instrument_data[50]));
+	BOOST_ASSERT(is_equal(data, std::vector<tbp::data_t::ptr>(instrument_data.begin() + 10, instrument_data.begin() + 51)));
+}
+
+BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
+{
+	// INIT (generate data)
+	const auto instrument_id = L"instrument1";
+	temp_folder tmp_folder;
+	const auto db_name = unique_string();
+	auto start_time = std::chrono::system_clock::now();
+	auto instrument_data = generate_data(100);
+	auto end_time = std::chrono::system_clock::now();
+
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+	tbp::oanda::data_storage ds(db);
+
+	// ACT
+	ds.save_instrument_data(instrument_id, instrument_data);
+	auto data = ds.get_instrument_data(instrument_id, &start_time, &end_time);
 
 	// ASSERT
 	BOOST_ASSERT(is_equal(data, instrument_data));
@@ -139,8 +177,33 @@ BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
 
 	// ACT
 	ds.save_instrument_data(instrument_id, instrument_data);
-	data = ds.get_instrument_data(instrument_id, start_time, end_time);
+	data = ds.get_instrument_data(instrument_id, &start_time, &end_time);
 
 	// ASSERT
+	BOOST_ASSERT(is_equal(data, instrument_data));
+}
+
+BOOST_FIXTURE_TEST_CASE(get_data_requested_range_bigger_than_available, common_fixture)
+{
+	// INIT (generate data)
+	const auto instrument_id = L"instrument1";
+	temp_folder tmp_folder;
+	const auto db_name = unique_string();
+	auto start_time = std::chrono::system_clock::now();
+	auto instrument_data = generate_data(100);
+	auto end_time = std::chrono::system_clock::now();
+
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+	tbp::oanda::data_storage ds(db);
+
+	// ACT
+	ds.save_instrument_data(instrument_id, instrument_data);
+	auto available_start = start_time - tbp::time_t::duration(10000);
+	auto available_end = end_time + tbp::time_t::duration(10000);
+	auto data = ds.get_instrument_data(instrument_id, &available_start, &available_end);
+
+	// ASSERT
+	BOOST_ASSERT(available_start == get_timestamp(*instrument_data.begin()));
+	BOOST_ASSERT(available_end == get_timestamp(*instrument_data.rbegin()));
 	BOOST_ASSERT(is_equal(data, instrument_data));
 }

@@ -10,7 +10,7 @@
 
 namespace tbp
 {
-	class data_collector
+	class data_collector : public data_provider
 	{
 		win::event m_start_evt;
 		win::event m_stop_evt;
@@ -21,6 +21,10 @@ namespace tbp
 
 	private:
 		void collect_data_thread();
+
+	public:
+		// SB: if data not present id data storage gets it from connector nd updates data storage 
+		virtual std::vector<data_t::ptr> get_instrument_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
 
 	public:
 		data_collector(const std::wstring& instrument_id, const tbp::connector::ptr& connector, const data_storage::ptr& ds);

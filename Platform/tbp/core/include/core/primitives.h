@@ -21,4 +21,6 @@ namespace tbp
 	public:
 		using std::map<std::wstring, value_t>::map;
 	};
+
+	using boost::get;
 }

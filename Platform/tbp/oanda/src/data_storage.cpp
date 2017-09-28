@@ -81,16 +81,21 @@ namespace tbp
 
 		}
 
-		std::vector<data_t::ptr> data_storage::get_instrument_data(const std::wstring& instrument_id, time_t start_datetime, time_t end_datetime)
+		std::vector<data_t::ptr> data_storage::get_instrument_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
 		{
+			if (nullptr == start_datetime || nullptr == end_datetime)
+			{
+				throw std::invalid_argument("start_datetime or end_datetime argument is null!");
+			}
+
 			auto st = m_db->create_statement(LR"(
 				SELECT TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME 
 					FROM INSTRUMENT_DATA 
-					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 )");
+					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 ORDER BY TIMESTAMP ASC )");
 
 			st->bind_value(instrument_id, 1);
-			st->bind_value(start_datetime.time_since_epoch().count(), 2);
-			st->bind_value(end_datetime.time_since_epoch().count(), 3);
+			st->bind_value(start_datetime->time_since_epoch().count(), 2);
+			st->bind_value(end_datetime->time_since_epoch().count(), 3);
 
 			auto candels_data_st = m_db->create_statement(LR"(
 				SELECT O_PRICE, H_PRICE, L_PRICE, C_PRICE 
@@ -119,6 +124,23 @@ namespace tbp
 				}
 
 				result.emplace_back(std::make_shared<tbp::data_t>(std::move(record)));
+			}
+
+			if (result.size() <= 1)
+			{
+				*end_datetime = *start_datetime;
+
+				return result;
+			}
+
+			{
+				auto timestamp_it = (*result.begin())->find(tbp::oanda::values::instrument_data::c_timestamp);
+				*start_datetime = tbp::get<tbp::time_t>(timestamp_it->second);
+			}
+
+			{
+				auto timestamp_it = (*result.rbegin())->find(tbp::oanda::values::instrument_data::c_timestamp);
+				*end_datetime = tbp::get<tbp::time_t>(timestamp_it->second);
 			}
 
 			return result;

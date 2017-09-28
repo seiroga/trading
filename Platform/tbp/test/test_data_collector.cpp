@@ -12,7 +12,7 @@ namespace
 		std::vector<tbp::data_t::ptr> values;
 		win::event on_new_data;
 
-		virtual std::vector<tbp::data_t::ptr> get_instrument_data(const std::wstring& instrument_id, tbp::time_t start_datetime, tbp::time_t end_datetime) override
+		virtual std::vector<tbp::data_t::ptr> get_instrument_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
 		{
 			return values;
 		}
@@ -46,6 +46,11 @@ namespace
 		virtual tbp::data_t::ptr get_instrument_data(const std::wstring& instrument_id) override
 		{
 			return value;
+		}
+
+		virtual std::vector<tbp::data_t::ptr> get_instrument_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
+		{
+			return { value };
 		}
 
 		virtual tbp::order::ptr create_order(const tbp::data_t& params) override
