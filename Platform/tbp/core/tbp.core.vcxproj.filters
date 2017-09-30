@@ -28,5 +28,8 @@
     <ClInclude Include="include\core\primitives.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\factory.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

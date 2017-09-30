@@ -4,6 +4,7 @@
 #include <string>
 
 #include <windows.h>
+#include <shlobj.h>
 
 namespace win
 {
@@ -29,6 +30,30 @@ namespace win
 
 			std::wstring path(buf);
 			return path.substr(0, path.find_last_of(L"\\"));
+		}
+
+		bool exists(const std::wstring& path)
+		{
+			auto res = ::GetFileAttributesW(path.c_str());
+			if (INVALID_FILE_ATTRIBUTES == res)
+			{
+				auto last_err = ::GetLastError();
+				if (ERROR_FILE_NOT_FOUND == last_err)
+				{
+					return false;
+				}
+
+				throw win::exception(L"GetFileAttributesW call failed!", last_err);
+			}
+
+			return true;
+		}
+
+		void create_path(const std::wstring& path)
+		{
+			int result = ::SHCreateDirectoryExW(nullptr, path.c_str(), nullptr);
+			if (ERROR_SUCCESS != result && ERROR_FILE_EXISTS != result && ERROR_ALREADY_EXISTS != result)
+				throw win::exception(L"SHCreateDirectoryExW call failed!");
 		}
 	}
 }

@@ -11,6 +11,16 @@
 
 namespace tbp
 {
+	struct authentication : sb::dynamic
+	{
+	public:
+		using ptr = std::shared_ptr<authentication>;
+
+	public:
+		virtual void login() = 0;
+		virtual std::wstring get_token() const = 0;
+	};
+
 	struct order : sb::dynamic
 	{
 		using ptr = std::shared_ptr<order>;

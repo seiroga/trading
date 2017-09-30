@@ -8,10 +8,16 @@
 
 namespace win
 {
+	/////////////////////////////////////////////////////////////////////////////////
+	// waitable
+
 	struct waitable
 	{
 		virtual bool wait(unsigned long timeout) = 0;
 	};
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// lockable
 
 	struct lockable
 	{
@@ -19,6 +25,9 @@ namespace win
 		virtual void lock() = 0;
 		virtual void unlock() = 0;
 	};
+
+	/////////////////////////////////////////////////////////////////////////////////
+	// scoped_lock
 
 	class scoped_lock : sb::noncopyable
 	{
@@ -46,17 +55,28 @@ namespace win
 		}
 	};
 
+	/////////////////////////////////////////////////////////////////////////////////
+	// wait_for_multiple_objects
+
+	template<typename T>
+	HANDLE get_value(const T& obj)
+	{
+		return obj.value;
+	}
+
+	HANDLE get_value(void* handle);
+
 	template<typename T, typename ...args_t>
 	void get_args_impl(std::vector<HANDLE>& result, const T& arg, const args_t&... args)
 	{
-		result.push_back(arg.value);
+		result.push_back(get_value(arg));
 		get_args_impl(result, args...);
 	}
 
 	template<typename T>
 	void get_args_impl(std::vector<HANDLE>& result, const T& arg)
 	{
-		result.push_back(arg.value);
+		result.push_back(get_value(arg));
 	}
 
 	template<typename T, typename ...args_t>
@@ -82,17 +102,17 @@ namespace win
 
 			case WAIT_TIMEOUT:
 			{
-				return { true, -1 };
+				return { false, -1 };
 			}
 		}
 
 		if (res >= WAIT_OBJECT_0 && res < WAIT_ABANDONED_0)
 		{
-			return { false, res - WAIT_OBJECT_0 };
+			return { true, res - WAIT_OBJECT_0 };
 		}
 		else if (res >= WAIT_ABANDONED_0)
 		{
-			return { false, res - WAIT_ABANDONED_0 };
+			return { true, res - WAIT_ABANDONED_0 };
 		}
 
 		throw win::exception(L"WaitForMultipleObjects call failed! Unknown result value!");

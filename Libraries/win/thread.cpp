@@ -2,6 +2,11 @@
 
 namespace win
 {
+	HANDLE get_value(void* handle)
+	{
+		return handle;
+	}
+
 	///////////////////////////////////////////////////////////////////////
 	// event implementation
 

@@ -140,6 +140,7 @@
     <ClInclude Include="include\core\connector.h" />
     <ClInclude Include="include\core\data_collector.h" />
     <ClInclude Include="include\core\data_storage.h" />
+    <ClInclude Include="include\core\factory.h" />
     <ClInclude Include="include\core\primitives.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
