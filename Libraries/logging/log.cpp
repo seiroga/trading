@@ -24,10 +24,12 @@ namespace logging
 	{
 		using win::fs::operator/;
 
-		// SB: severity didn't shown in the log file ????
+		// SB: severity isn't shown in the log file ????
 		boost::log::add_file_log
 		(
 			boost::log::keywords::file_name = path / L"log_%N.txt",
+			boost::log::keywords::open_mode = std::ios_base::app,
+			boost::log::keywords::auto_flush = true,
 			boost::log::keywords::rotation_size = 1 * 1024 * 1024,
 			boost::log::keywords::format = log_entry_format_str
 		);
