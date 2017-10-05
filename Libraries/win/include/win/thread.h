@@ -135,22 +135,22 @@ namespace win
 		event(bool manual_reset, bool initial_state);
 	};
 
-	///////////////////////////////////////////////////////////////////////////////////
-	//// crirical_section
+	/////////////////////////////////////////////////////////////////////////////////
+	// crirical_section
 
-	//class critical_section : public common_handle, public waitable, public lockable
-	//{
-	//public:
-	//	virtual bool wait(unsigned long timeout) override;
+	class critical_section : public lockable
+	{
+		CRITICAL_SECTION m_cs;
 
-	//public:
-	//	virtual bool try_lock() override;
-	//	virtual void lock() override;
-	//	virtual void unlock() override;
+	public:
+		virtual bool try_lock() override;
+		virtual void lock() override;
+		virtual void unlock() override;
 
-	//public:
-	//	critical_section();
-	//};
+	public:
+		critical_section();
+		~critical_section();
+	};
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// crirical_section

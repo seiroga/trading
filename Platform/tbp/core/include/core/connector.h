@@ -30,16 +30,15 @@ namespace tbp
 		virtual void cancel() = 0;
 	};
 
-	class connector : data_provider
+	struct connector : sb::dynamic
 	{
 	public:
 		using ptr = std::shared_ptr<connector>;
 
 	public:
-		using data_provider::get_instrument_data;
-
 		virtual std::vector<std::wstring> get_instruments() const = 0;
-		virtual data_t::ptr get_instrument_data(const std::wstring& instrument_id) = 0;
+		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
+		virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) = 0;
 		virtual order::ptr create_order(const data_t& params) = 0;
 	};
 }

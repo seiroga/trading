@@ -163,10 +163,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\connector.cpp" />
     <ClCompile Include="src\data_storage.cpp" />
     <ClCompile Include="src\factory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\oanda\connector.h" />
     <ClInclude Include="include\oanda\data_storage.h" />
     <ClInclude Include="include\oanda\factory.h" />
   </ItemGroup>

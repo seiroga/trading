@@ -1,5 +1,6 @@
 #include <oanda/factory.h>
 #include <oanda/data_storage.h>
+#include <oanda/connector.h>
 
 #include <sqlite/sqlite.h>
 #include <logging/log.h>
@@ -26,7 +27,7 @@ namespace tbp
 			std::wstring full_path = path / L"oanda";
 			win::fs::create_path(full_path);
 
-			full_path = full_path / L"broker_data.db";
+			full_path = full_path / L"instrument_data.db";
 			if (win::fs::exists(full_path))
 			{
 				LOG_INFO << "Open existing OANDA database.";

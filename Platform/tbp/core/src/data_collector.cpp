@@ -13,14 +13,37 @@ namespace tbp
 			return;
 		}
 
-		while (!m_stop_evt.wait(100))
+		while (!m_stop_evt.wait(20))
 		{
-			auto data = m_connector->get_instrument_data(m_instrument_id);
-			m_data_storage->save_instrument_data(m_instrument_id, { data });
+			auto data = m_connector->get_instant_data(m_instrument_id);
+
+			{
+				win::scoped_lock lock(m_cache_cs);
+
+				m_cache.emplace_back(std::move(data));
+
+				if (m_cache.size() >= 1000)
+				{
+					flush_cache();
+				}
+			}
 		}
 	}
 
-	std::vector<data_t::ptr> data_collector::get_instrument_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const
+	void data_collector::flush_cache()
+	{
+		win::scoped_lock lock(m_cache_cs);
+
+		if (m_cache.empty())
+		{
+			return;
+		}
+
+		m_data_storage->save_instant_data(m_instrument_id, m_cache);
+		m_cache.clear();
+	}
+
+	std::vector<data_t::ptr> data_collector::get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const
 	{
 		if (nullptr == start_datetime || nullptr == end_datetime)
 		{
@@ -29,14 +52,30 @@ namespace tbp
 
 		auto actual_start = *start_datetime;
 		auto actual_end = *end_datetime;
-		auto result = m_data_storage->get_instrument_data(instrument_id, &actual_start, &actual_end);
+		auto result = m_data_storage->get_data(instrument_id, &actual_start, &actual_end);
 
 		if (actual_start != *start_datetime || actual_end != *end_datetime)
 		{
 			// SB: should we make connector call from worker thread? Is it some reason for this? Anyway we will wait untill data arrives...
-			result = m_connector->get_instrument_data(instrument_id, start_datetime, end_datetime);
-			m_data_storage->save_instrument_data(instrument_id, result);
+			result = m_connector->get_data(instrument_id, start_datetime, end_datetime);
+			m_data_storage->save_data(instrument_id, result);
 		}
+
+		return result;
+	}
+
+	std::vector<data_t::ptr> data_collector::get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const
+	{
+		if (nullptr == start_datetime || nullptr == end_datetime)
+		{
+			throw std::invalid_argument("start_datetime or end_datetime argument is null!");
+		}
+
+		const_cast<data_collector*>(this)->flush_cache();
+
+		auto actual_start = *start_datetime;
+		auto actual_end = *end_datetime;
+		auto result = m_data_storage->get_instant_data(instrument_id, &actual_start, &actual_end);
 
 		return result;
 	}
@@ -49,6 +88,7 @@ namespace tbp
 		, m_connector(connector)
 		, m_worker(std::bind(&data_collector::collect_data_thread, this))
 	{
+		//m_cache.reserve(10000);
 		m_start_evt.set();
 	}
 

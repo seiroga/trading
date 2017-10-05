@@ -15,6 +15,12 @@ namespace tbp
 				const std::wstring c_ask_candlestick(L"ASK_CANDLESTICK");
 			}
 
+			namespace instant_data
+			{
+				const std::wstring c_bid_price(L"BID");
+				const std::wstring c_ask_price(L"ASK");
+			}
+
 			namespace candlestick_data
 			{
 				const std::wstring c_open_price(L"O_PRICE");
@@ -69,6 +75,9 @@ namespace tbp
 			st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
 			st->step();
 
+			st = m_db->create_statement(L"CREATE TABLE [INSTANT_INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID] DOUBLE, [ASK] DOUBLE, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
+			st->step();
+
 			m_db->set_schema_version(current_schema_version);
 
 			t.commit();
@@ -78,10 +87,29 @@ namespace tbp
 
 		void data_storage::verify_db_schema()
 		{
-
 		}
 
-		std::vector<data_t::ptr> data_storage::get_instrument_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
+		__int64 data_storage::get_instrument_row_id(const std::wstring& instrument_id)
+		{
+			auto insert_instrument_st = m_db->create_statement(L"INSERT INTO INSTRUMENTS (NAME) VALUES (?1)");
+			auto select_instrument_id_st = m_db->create_statement(L"SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1");
+			select_instrument_id_st->bind_value(instrument_id, 1);
+			__int64 instrument_row_id = -1;
+			if (select_instrument_id_st->step())
+			{
+				instrument_row_id = select_instrument_id_st->get_value<__int64>(0);
+			}
+			else
+			{
+				insert_instrument_st->bind_value(instrument_id, 1);
+				insert_instrument_st->step();
+				instrument_row_id = insert_instrument_st->last_insert_row_id();
+			}
+
+			return instrument_row_id;
+		}
+
+		std::vector<data_t::ptr> data_storage::get_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
 		{
 			if (nullptr == start_datetime || nullptr == end_datetime)
 			{
@@ -106,8 +134,8 @@ namespace tbp
 			while (st->step())
 			{
 				tbp::data_t record;
-				record[L"TIMESTAMP"] = tbp::time_t(tbp::time_t::duration(st->get_value<__int64>(0)));
-				record[L"VOLUME"] = st->get_value<__int64>(3);
+				record[values::instrument_data::c_timestamp] = tbp::time_t(tbp::time_t::duration(st->get_value<__int64>(0)));
+				record[values::instrument_data::c_volume] = st->get_value<__int64>(3);
 
 				candels_data_st->reset();
 				candels_data_st->bind_value(st->get_value<__int64>(1), 1);
@@ -146,27 +174,60 @@ namespace tbp
 			return result;
 		}
 
-		void data_storage::save_instrument_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data)
+		std::vector<data_t::ptr> data_storage::get_instant_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
+		{
+			if (nullptr == start_datetime || nullptr == end_datetime)
+			{
+				throw std::invalid_argument("start_datetime or end_datetime argument is null!");
+			}
+
+			auto st = m_db->create_statement(LR"(
+				SELECT TIMESTAMP, BID, ASK
+					FROM INSTANT_INSTRUMENT_DATA 
+					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTANT_INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTANT_INSTRUMENT_DATA.TIMESTAMP <= ?3 ORDER BY TIMESTAMP ASC )");
+
+			st->bind_value(instrument_id, 1);
+			st->bind_value(start_datetime->time_since_epoch().count(), 2);
+			st->bind_value(end_datetime->time_since_epoch().count(), 3);
+
+			std::vector<data_t::ptr> result;
+			while (st->step())
+			{
+				tbp::data_t record;
+				record.emplace(values::instrument_data::c_timestamp, tbp::time_t(tbp::time_t::duration(st->get_value<__int64>(0))));
+				record.emplace(values::instant_data::c_bid_price, st->get_value<double>(1));
+				record.emplace(values::instant_data::c_ask_price, st->get_value<double>(2));
+
+				result.emplace_back(std::make_shared<tbp::data_t>(std::move(record)));
+			}
+
+			if (result.size() <= 1)
+			{
+				*end_datetime = *start_datetime;
+
+				return result;
+			}
+
+			{
+				auto timestamp_it = (*result.begin())->find(tbp::oanda::values::instrument_data::c_timestamp);
+				*start_datetime = tbp::get<tbp::time_t>(timestamp_it->second);
+			}
+
+			{
+				auto timestamp_it = (*result.rbegin())->find(tbp::oanda::values::instrument_data::c_timestamp);
+				*end_datetime = tbp::get<tbp::time_t>(timestamp_it->second);
+			}
+
+			return result;
+		}
+
+		void data_storage::save_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data)
 		{
 			sqlite::transaction t(m_db);
 
 			try
 			{
-				auto insert_instrument_st = m_db->create_statement(L"INSERT INTO INSTRUMENTS (NAME) VALUES (?1)");
-				auto select_instrument_id_st = m_db->create_statement(L"SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1");
-				select_instrument_id_st->bind_value(instrument_id, 1);
-				__int64 instrument_row_id = -1;
-				if (select_instrument_id_st->step())
-				{
-					instrument_row_id = select_instrument_id_st->get_value<__int64>(0);
-				}
-				else
-				{
-					insert_instrument_st->bind_value(instrument_id, 1);
-					insert_instrument_st->step();
-					instrument_row_id = insert_instrument_st->last_insert_row_id();
-				}
-
+				const __int64 instrument_row_id = get_instrument_row_id(instrument_id);
 				auto insert_candle_data_st = m_db->create_statement(L"INSERT INTO CANDLES(O_PRICE, H_PRICE, L_PRICE, C_PRICE) VALUES (?1, ?2, ?3, ?4)");
 				auto insert_instrument_data_st = m_db->create_statement(L"INSERT OR REPLACE INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5)");
 				for (const auto& instrument_data : data)
@@ -239,6 +300,64 @@ namespace tbp
 						}
 
 						insert_instrument_data_st->bind_value(boost::get<__int64>(it->second), 5);
+					}
+
+					insert_instrument_data_st->step();
+				}
+
+				t.commit();
+			}
+			catch (...)
+			{
+				t.rollback();
+				throw;
+			}
+		}
+
+		void data_storage::save_instant_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data)
+		{
+			sqlite::transaction t(m_db);
+
+			try
+			{
+				const __int64 instrument_row_id = get_instrument_row_id(instrument_id);
+				auto insert_instrument_data_st = m_db->create_statement(L"INSERT OR REPLACE INTO INSTANT_INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID, ASK) VALUES (?1, ?2, ?3, ?4)");
+				for (const auto& instrument_data : data)
+				{
+					insert_instrument_data_st->reset();
+					insert_instrument_data_st->bind_value(instrument_row_id, 1);
+
+					// TIMESTAMP
+					{
+						auto it = instrument_data->find(values::instrument_data::c_timestamp);
+						if (instrument_data->end() == it)
+						{
+							throw std::runtime_error("TIMESTAMP value isn't provided by instant instrument data!");
+						}
+
+						insert_instrument_data_st->bind_value(tbp::get<tbp::time_t>(it->second).time_since_epoch().count(), 2);
+					}
+
+					// BID
+					{
+						auto it = instrument_data->find(values::instant_data::c_bid_price);
+						if (instrument_data->end() == it)
+						{
+							throw std::runtime_error("BID value isn't provided by instant instrument data!");
+						}
+
+						insert_instrument_data_st->bind_value(tbp::get<double>(it->second), 3);
+					}
+
+					// ASK
+					{
+						auto it = instrument_data->find(values::instant_data::c_ask_price);
+						if (instrument_data->end() == it)
+						{
+							throw std::runtime_error("ASK value isn't provided by instant instrument data!");
+						}
+
+						insert_instrument_data_st->bind_value(tbp::get<double>(it->second), 4);
 					}
 
 					insert_instrument_data_st->step();

@@ -17,6 +17,12 @@ namespace tbp
 				extern const std::wstring c_ask_candlestick;
 			}
 
+			namespace instant_data
+			{
+				extern const std::wstring c_bid_price;
+				extern const std::wstring c_ask_price;
+			}
+
 			namespace candlestick_data
 			{
 				extern const std::wstring c_open_price;
@@ -34,9 +40,13 @@ namespace tbp
 			void create_db_schema();
 			void verify_db_schema();
 
+			__int64 get_instrument_row_id(const std::wstring& instrument_id);
+
 		public:
-			virtual std::vector<data_t::ptr> get_instrument_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
-			virtual void save_instrument_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
+			virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
+			virtual std::vector<data_t::ptr> get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
+			virtual void save_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
+			virtual void save_instant_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
 
 		public:
 			data_storage(const sqlite::connection::ptr& db);

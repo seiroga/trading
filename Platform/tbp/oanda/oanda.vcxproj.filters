@@ -17,12 +17,18 @@
     <ClCompile Include="src\factory.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\connector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\oanda\data_storage.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\oanda\factory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\oanda\connector.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
