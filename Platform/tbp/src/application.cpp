@@ -14,7 +14,7 @@ namespace tbp
 
 		LOG_INFO << "Starting application...";
 
-		m_storage = m_factory->create_storage(win::fs::get_current_module_dir() / L"DB");
+		m_storage = m_factory->create_storage();
 		auto auth = m_factory->create_auth();
 		m_connector = m_factory->create_connector(auth);
 		//m_data_collector = std::make_shared<tbp::data_collector>(L"EUR_USR", m_connector, m_storage);

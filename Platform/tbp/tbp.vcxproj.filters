@@ -27,4 +27,9 @@
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\auth.dat">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
 </Project>

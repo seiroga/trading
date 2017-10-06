@@ -15,12 +15,12 @@ namespace tbp
 {
 	namespace
 	{
-		const std::map<std::wstring, tbp::factory::ptr> broker_factories = 
+		const std::map<std::wstring, tbp::factory::ptr(*)(const std::wstring& working_dir)> broker_factories = 
 		{
-			{ L"OANDA", oanda::factory::create() }
+			{ L"OANDA", &oanda::factory::create }
 		};
 
-		tbp::factory::ptr get_broker_factory(const std::wstring& broker_id)
+		tbp::factory::ptr get_broker_factory(const std::wstring& broker_id, const std::wstring& working_dir)
 		{
 			auto it = broker_factories.find(broker_id);
 			if (broker_factories.end() == it)
@@ -28,7 +28,7 @@ namespace tbp
 				throw std::runtime_error("Factory for specified broker wasn't found!");
 			}
 
-			return it->second;
+			return it->second(working_dir);
 		}
 	}
 }
@@ -39,9 +39,10 @@ int wmain()
 	{
 		using win::fs::operator/;
 
-		logging::init(logging::level::debug, win::fs::get_current_module_dir() / L"Logs", true);
+		const std::wstring working_dir = win::fs::get_current_module_dir();
+		logging::init(logging::level::debug, working_dir / L"Logs", true);
 
-		tbp::application app(tbp::get_broker_factory(L"OANDA"));
+		tbp::application app(tbp::get_broker_factory(L"OANDA", working_dir));
 		app.start();
 	}
 	catch (const std::exception& ex)
@@ -63,6 +64,8 @@ int wmain()
 
 		return -2;
 	}
+
+	LOG_INFO << L"============================== logging finished ===================================";
 
     return 0;
 }

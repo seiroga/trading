@@ -77,6 +77,7 @@ namespace logging
 			boost::log::core::get()->add_sink(sink);
 		}
 
+		LOG_INFO << L"============================== logging started ===================================";
 		LOG_INFO << L"Logging subsystem has been initialized successfuly!";
 	}
 }
