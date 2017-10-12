@@ -28,8 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\auth.dat">
-      <Filter>res</Filter>
-    </None>
+    <CustomBuild Include="res\auth.dat" />
   </ItemGroup>
 </Project>

@@ -39,6 +39,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "boost.log", "..\..\Librarie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_helpers", "..\..\Libraries\common\test_helpers\test_helpers.vcxproj", "{75FB6708-6016-43A5-98B4-1419E098BD37}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\Libraries\3rdParty\zlib\zlib.vcxproj", "{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\..\Libraries\3rdParty\cpprest_internal\Release\src\build\common.vcxitems*{594dcb5f-07e3-4084-a2ce-268611fa629f}*SharedItemsImports = 9
@@ -187,6 +189,16 @@ Global
 		{75FB6708-6016-43A5-98B4-1419E098BD37}.Release|x64.Build.0 = Release|x64
 		{75FB6708-6016-43A5-98B4-1419E098BD37}.Release|x86.ActiveCfg = Release|Win32
 		{75FB6708-6016-43A5-98B4-1419E098BD37}.Release|x86.Build.0 = Release|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Debug|ARM.ActiveCfg = Debug|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Debug|x64.ActiveCfg = Debug|x64
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Debug|x64.Build.0 = Debug|x64
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Debug|x86.ActiveCfg = Debug|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Debug|x86.Build.0 = Debug|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Release|ARM.ActiveCfg = Release|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Release|x64.ActiveCfg = Release|x64
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Release|x64.Build.0 = Release|x64
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Release|x86.ActiveCfg = Release|Win32
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -205,6 +217,7 @@ Global
 		{D16C9DF5-0A70-4472-A0E6-E27B4826456D} = {3E86FC9A-D6BF-4B0D-96D6-E9258C4DDCB0}
 		{E8559D17-860E-4446-9B23-2339C784780F} = {3E86FC9A-D6BF-4B0D-96D6-E9258C4DDCB0}
 		{75FB6708-6016-43A5-98B4-1419E098BD37} = {766B2294-A21B-477A-A402-82992456ABDA}
+		{F4DAE977-AA0F-4A08-994D-F4B3A8685F1A} = {766B2294-A21B-477A-A402-82992456ABDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F8A79CB5-15C5-4F06-8811-1449545D63D0}
