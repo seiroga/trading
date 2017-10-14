@@ -1,5 +1,7 @@
 #include "application.h"
 
+#include <common/string_cvt.h>
+
 #include <oanda/factory.h>
 #include <core/factory.h>
 
@@ -54,7 +56,7 @@ int wmain()
 	catch (const win::exception& ex)
 	{
 		// SB: TODO need to implement string conversion function!!!
-		std::cout << "Exception was thrown during application initialization!. Info: " << ex.msg.c_str();
+		std::cout << "Exception was thrown during application initialization!. Info: " << sb::to_str(ex.msg);
 
 		return -1;
 	}

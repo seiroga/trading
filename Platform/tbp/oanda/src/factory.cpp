@@ -2,20 +2,20 @@
 #include <oanda/data_storage.h>
 #include <oanda/connector.h>
 
+#include <common/string_cvt.h>
+
 #include <sqlite/sqlite.h>
 #include <logging/log.h>
 
 #include <win/fs.h>
 
-#include <locale>
-#include <codecvt>
 #include <fstream>
 
 namespace tbp
 {
 	namespace oanda
 	{
-		authentication::ptr factory::create_auth()
+		tbp::authentication::ptr factory::create_auth()
 		{
 			using win::fs::operator/;
 
@@ -25,8 +25,7 @@ namespace tbp
 				throw std::runtime_error("Authentication token file wasn't found!");
 			}
 
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> string_cvt;
-			auto utf8_path = string_cvt.to_bytes(path);
+			auto utf8_path = sb::to_str(path);
 
 			std::string token;
 			std::ifstream auth_file(utf8_path.c_str(), std::ios::in);
@@ -36,15 +35,15 @@ namespace tbp
 			}
 
 			auth_file >> token;
-
+			
 			LOG_INFO << L"Authorization token has been read successfully!";
 
-			return std::make_shared<authentication>(string_cvt.from_bytes(token));
+			return std::make_shared<authentication>(sb::to_str(token));
 		}
 
-		connector::ptr factory::create_connector(const authentication::ptr& auth)
+		tbp::connector::ptr factory::create_connector(const authentication::ptr& auth)
 		{
-			return connector::ptr();
+			return connector::create(auth);
 		}
 
 		data_storage::ptr factory::create_storage()

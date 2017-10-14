@@ -11,9 +11,9 @@ namespace tbp
 			const std::wstring m_working_dir;
 
 		public:
-			virtual authentication::ptr create_auth() override;
-			virtual connector::ptr create_connector(const authentication::ptr& auth) override;
-			virtual data_storage::ptr create_storage() override;
+			virtual tbp::authentication::ptr create_auth() override;
+			virtual tbp::connector::ptr create_connector(const authentication::ptr& auth) override;
+			virtual tbp::data_storage::ptr create_storage() override;
 
 		public:
 			static ptr create(const std::wstring& working_dir);

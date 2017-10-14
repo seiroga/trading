@@ -23,6 +23,7 @@ namespace tbp
 
 	struct order : sb::dynamic
 	{
+	public:
 		using ptr = std::shared_ptr<order>;
 
 	public:
