@@ -28,5 +28,8 @@
     <ClInclude Include="include\win\handle.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\win\exception.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

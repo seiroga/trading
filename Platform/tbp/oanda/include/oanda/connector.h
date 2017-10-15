@@ -27,7 +27,7 @@ namespace tbp
 
 		struct connector
 		{
-			static tbp::connector::ptr create(const authentication::ptr& auth);
+			static tbp::connector::ptr create(const authentication::ptr& auth, bool practice);
 		};
 	}
 }

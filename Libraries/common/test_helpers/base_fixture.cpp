@@ -72,7 +72,7 @@ namespace test_helpers
 	{
 		int result = ::SHCreateDirectoryExW(nullptr, path.c_str(), nullptr);
 		if (ERROR_SUCCESS != result && ERROR_FILE_EXISTS != result && ERROR_ALREADY_EXISTS != result)
-			throw win::exception(L"Failed to create path: " + path, result);
+			throw win::exception((L"Failed to create path: " + path).c_str(), result);
 	}
 
 	base_fixture::temp_folder::~temp_folder()

@@ -43,7 +43,7 @@ namespace tbp
 
 		tbp::connector::ptr factory::create_connector(const authentication::ptr& auth)
 		{
-			return connector::create(auth);
+			return connector::create(auth, m_practice);
 		}
 
 		data_storage::ptr factory::create_storage()
@@ -71,11 +71,17 @@ namespace tbp
 
 		factory::ptr factory::create(const std::wstring& working_dir)
 		{
-			return std::make_shared<factory>(working_dir);
+			return std::make_shared<factory>(working_dir, false);
 		}
 
-		factory::factory(const std::wstring& working_dir)
-			: m_working_dir(working_dir)
+		factory::ptr factory::create_practice(const std::wstring& working_dir)
+		{
+			return std::make_shared<factory>(working_dir, true);
+		}
+
+		factory::factory(const std::wstring& working_dir, bool practice)
+			: m_practice(practice)
+			, m_working_dir(working_dir)
 		{
 		}
 	}

@@ -11,7 +11,7 @@ namespace win
 		const DWORD code;
 		const std::wstring msg;
 
-		exception(const std::wstring& msg, DWORD err_code = ::GetLastError())
+		exception(const wchar_t* msg, DWORD err_code = ::GetLastError())
 			: code(err_code)
 			, msg(msg)
 		{

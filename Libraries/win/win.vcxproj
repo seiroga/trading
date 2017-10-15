@@ -23,6 +23,7 @@
     <ClCompile Include="thread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\win\exception.h" />
     <ClInclude Include="include\win\fs.h" />
     <ClInclude Include="include\win\handle.h" />
     <ClInclude Include="include\win\thread.h" />

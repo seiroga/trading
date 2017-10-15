@@ -178,7 +178,7 @@ namespace tbp
 			};
 
 			/////////////////////////////////////////////////////////////////////////
-			// connector implemnetation
+			// connector_impl implemnetation
 
 			class connector_impl : public tbp::connector
 			{
@@ -275,9 +275,9 @@ namespace tbp
 				}
 
 			public:
-				connector_impl(const authentication::ptr& auth)
+				connector_impl(const std::wstring& url, const authentication::ptr& auth)
 					: m_token(auth->get_token())
-					, m_schema(L"https://api-fxpractice.oanda.com", L"v3")
+					, m_schema(url, L"v3")
 				{
 				}
 
@@ -287,9 +287,12 @@ namespace tbp
 			};
 		}
 
-		tbp::connector::ptr connector::create(const authentication::ptr& auth)
+		///////////////////////////////////////////////////////////////////////////////////////
+		// connector
+
+		tbp::connector::ptr connector::create(const authentication::ptr& auth, bool practice)
 		{
-			return std::make_shared<connector_impl>(auth);
+			return std::make_shared<connector_impl>(practice ? L"https://api-fxpractice.oanda.com" : L"https://api-fxtrade.oanda.com", auth);
 		}
 	}
 }

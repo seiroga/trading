@@ -8,6 +8,7 @@ namespace tbp
 	{
 		class factory : public tbp::factory
 		{
+			const bool m_practice;
 			const std::wstring m_working_dir;
 
 		public:
@@ -17,9 +18,10 @@ namespace tbp
 
 		public:
 			static ptr create(const std::wstring& working_dir);
+			static ptr create_practice(const std::wstring& working_dir);
 
 		public:
-			factory(const std::wstring& working_dir);
+			factory(const std::wstring& working_dir, bool practice);
 		};
 	}
 }
