@@ -1,0 +1,9 @@
+{
+	"connector_info": {
+		"OANDA": {
+			"url": "https://api-fxpractice.oanda.com",
+			"auth_token": "",
+			"account_id": ""
+		}
+	}
+}

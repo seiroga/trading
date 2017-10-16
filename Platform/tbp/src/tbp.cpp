@@ -20,7 +20,6 @@ namespace tbp
 		const std::map<std::wstring, tbp::factory::ptr(*)(const std::wstring& working_dir)> broker_factories = 
 		{
 			{ L"OANDA", &oanda::factory::create },
-			{ L"OANDA Practice", &oanda::factory::create_practice }
 		};
 
 		tbp::factory::ptr get_broker_factory(const std::wstring& broker_id, const std::wstring& working_dir)
@@ -45,7 +44,7 @@ int wmain()
 		const std::wstring working_dir = win::fs::get_current_module_dir();
 		logging::init(logging::level::debug, working_dir / L"Logs", true);
 
-		tbp::application app(tbp::get_broker_factory(L"OANDA Practice", working_dir));
+		tbp::application app(tbp::get_broker_factory(L"OANDA", working_dir));
 		app.start();
 	}
 	catch (const std::exception& ex)

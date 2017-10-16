@@ -183,6 +183,7 @@ namespace tbp
 			class connector_impl : public tbp::connector
 			{
 				const std::wstring m_token;
+				const std::wstring m_account_id;
 				const schema m_schema;
 
 			private:
@@ -275,8 +276,9 @@ namespace tbp
 				}
 
 			public:
-				connector_impl(const std::wstring& url, const authentication::ptr& auth)
+				connector_impl(const std::wstring& url, const std::wstring& account_id, const authentication::ptr& auth)
 					: m_token(auth->get_token())
+					, m_account_id(account_id)
 					, m_schema(url, L"v3")
 				{
 				}
@@ -290,9 +292,9 @@ namespace tbp
 		///////////////////////////////////////////////////////////////////////////////////////
 		// connector
 
-		tbp::connector::ptr connector::create(const authentication::ptr& auth, bool practice)
+		tbp::connector::ptr connector::create(const std::wstring& url, const std::wstring& account_id, const authentication::ptr& auth)
 		{
-			return std::make_shared<connector_impl>(practice ? L"https://api-fxpractice.oanda.com" : L"https://api-fxtrade.oanda.com", auth);
+			return std::make_shared<connector_impl>(url, account_id, auth);
 		}
 	}
 }

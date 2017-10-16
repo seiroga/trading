@@ -28,6 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\auth.dat" />
+    <CustomBuild Include="res\connector_info.json" />
   </ItemGroup>
 </Project>

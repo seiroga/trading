@@ -2,14 +2,19 @@
 
 #include <core/factory.h>
 
+#include <memory>
+
 namespace tbp
 {
 	namespace oanda
 	{
 		class factory : public tbp::factory
 		{
-			const bool m_practice;
+			struct connector_info;
+
+		private:
 			const std::wstring m_working_dir;
+			const std::unique_ptr<connector_info> m_connector_cfg;
 
 		public:
 			virtual tbp::authentication::ptr create_auth() override;
@@ -18,10 +23,9 @@ namespace tbp
 
 		public:
 			static ptr create(const std::wstring& working_dir);
-			static ptr create_practice(const std::wstring& working_dir);
 
 		public:
-			factory(const std::wstring& working_dir, bool practice);
+			factory(const std::wstring& working_dir);
 		};
 	}
 }
