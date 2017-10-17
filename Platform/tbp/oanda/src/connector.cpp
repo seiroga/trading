@@ -101,7 +101,17 @@ namespace tbp
 				// SB: read milliseconds if exists
 				if (std::wsregex_token_iterator() != ++submatches_iterator)
 				{
-					st.wMilliseconds = _wtoi(std::wstring(*submatches_iterator).c_str());
+					//SB: according to https://msdn.microsoft.com/en-us/library/windows/desktop/ms724950(v=vs.85).aspx
+					auto ms_str = std::wstring(*submatches_iterator);
+					auto ms = _wtoi(ms_str.c_str());
+					if (ms_str.size() > 3)
+					{
+						double ms_d = ms / pow(10, ms_str.size() - 3);
+						ms_d = round(ms_d);
+						ms = (int)ms_d;
+					}
+
+					st.wMilliseconds = ms;
 				}
 
 				// SB: convert to time_t
@@ -111,7 +121,7 @@ namespace tbp
 				FILETIME ft = { 0 };
 				if (0 == SystemTimeToFileTime(&st, &ft))
 				{
-					throw std::runtime_error("SystemTimeToFileTime call failed!");
+					throw win::exception(L"SystemTimeToFileTime call failed!");
 				}
 
 				return tbp::time_t(tbp::time_t::duration(*reinterpret_cast<__int64*>(&ft)));
@@ -149,7 +159,7 @@ namespace tbp
 					uri_path.append_path(L"accounts");
 					uri_path.append_path(account_id);
 					uri_path.append_path(L"pricing");
-					uri_path.append_query(L"instruments" + create_comma_sep_values(instruments), true);
+					uri_path.append_query(L"instruments", create_comma_sep_values(instruments));
 
 					return uri_path.to_string();
 				}
@@ -198,6 +208,31 @@ namespace tbp
 					return request;
 				}
 
+				web::json::value execute_request(const std::wstring& url) const
+				{
+					concurrency::streams::container_buffer<std::vector<tbp::byte_t>> buffer;
+
+					// Create http_client to send the request.
+					web::http::client::http_client client(url);
+					auto request = create_request(web::http::methods::GET);
+
+					// Handle response headers arriving.
+					auto requestTask = client.request(request).then([&](web::http::http_response response)
+					{
+						// Write response body into the file.
+						return response.body().read_to_end(buffer);
+					});
+
+					// Wait for all the outstanding I/O to complete
+					requestTask.wait();
+
+					std::wstring str_responce = sb::to_str(std::string(buffer.collection().begin(), buffer.collection().end()));
+					auto json_responce = web::json::value::parse(str_responce);
+
+					return json_responce;
+				}
+
+			private:
 				static tbp::data_t parse_candle_object(const web::json::object& candle_data)
 				{
 					tbp::data_t result;
@@ -219,26 +254,7 @@ namespace tbp
 			public:
 				virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start, time_t* end) const override
 				{
-					using namespace web::json;
-
-					concurrency::streams::container_buffer<std::vector<tbp::byte_t>> buffer;
-
-					// Create http_client to send the request.
-					web::http::client::http_client client(m_schema.get_historical_prices_url(instrument_id, L"S5", *start, *end));
-					auto request = create_request(web::http::methods::GET);
-
-					// Handle response headers arriving.
-					auto requestTask = client.request(request).then([&](web::http::http_response response)
-					{
-						// Write response body into the file.
-						return response.body().read_to_end(buffer);
-					});
-
-					// Wait for all the outstanding I/O to complete
-					requestTask.wait();
-
-					std::wstring str_responce = sb::to_str(std::string(buffer.collection().begin(), buffer.collection().end()));
-					auto json_responce = web::json::value::parse(str_responce);
+					auto json_responce = execute_request(m_schema.get_historical_prices_url(instrument_id, L"S5", *start, *end));
 
 					std::vector<data_t::ptr> result;
 					{
@@ -262,12 +278,44 @@ namespace tbp
 			public:
 				virtual std::vector<std::wstring> get_instruments() const override
 				{
-					return {};
+					auto json_responce = execute_request(m_schema.get_instruments_url(m_account_id));
+
+					std::vector<std::wstring> result;
+					auto instruments = json_responce.at(L"instruments").as_array();
+					for (const auto& instrument_info : instruments)
+					{
+						result.push_back(instrument_info.at(L"name").as_string());
+					}
+
+					return result;
 				}
 
 				virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) override
 				{
-					return nullptr;
+					auto json_responce = execute_request(m_schema.get_instant_prices_url(m_account_id, { instrument_id }));
+
+					auto result = std::make_shared<tbp::data_t>();
+					auto prices = json_responce.at(L"prices").as_array();
+					for (const auto& price_info : prices)
+					{
+						result->emplace(tbp::oanda::values::instrument_data::c_timestamp, to_time(price_info.at(L"time").as_string()));
+
+						{
+							// ask price
+							// read first one from array
+							auto ask_prices = price_info.at(L"asks").as_array();
+							result->emplace(tbp::oanda::values::instant_data::c_ask_price, ask_prices.size() > 0 ? to_double(ask_prices.at(0).at(L"price").as_string()) : 0.0);
+						}
+
+						{
+							// bid price
+							// read first one from array
+							auto bid_prices = price_info.at(L"bids").as_array();
+							result->emplace(tbp::oanda::values::instant_data::c_bid_price, bid_prices.size() > 0 ? to_double(bid_prices.at(0).at(L"price").as_string()) : 0.0);
+						}
+					}
+
+					return result;
 				}
 
 				virtual order::ptr create_order(const data_t& params) override
