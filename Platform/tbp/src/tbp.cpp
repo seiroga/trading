@@ -49,21 +49,19 @@ int wmain()
 	}
 	catch (const std::exception& ex)
 	{
-		std::cout << "Exception was thrown during application initialization!. Info: " << ex.what();
+		LOG_ERR << "Exception was thrown during application initialization!. Info: " << ex.what();
 
 		return -1;
 	}
 	catch (const win::exception& ex)
 	{
-		// SB: TODO need to implement string conversion function!!!
-		std::cout << "Exception was thrown during application initialization!. Info: " << sb::to_str(ex.msg);
+		LOG_ERR << "Exception was thrown during application initialization!. Info: " << sb::to_str(ex.msg);
 
 		return -1;
 	}
 	catch (...)
 	{
-		std::cout << "Unknown exception was thrown during application initialization!";
-
+		LOG_ERR << "Unknown exception was thrown during application initialization!";
 		return -2;
 	}
 
