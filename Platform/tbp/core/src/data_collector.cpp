@@ -1,5 +1,7 @@
 #include <core/data_collector.h>
 
+#include <logging/log.h>
+
 #include <future>
 
 namespace tbp
@@ -13,21 +15,39 @@ namespace tbp
 			return;
 		}
 
-		while (!m_stop_evt.wait(20))
+		while (!m_stop_evt.wait(10))
 		{
-			auto data = m_connector->get_instant_data(m_instrument_id);
-
+			try
 			{
-				win::scoped_lock lock(m_cache_cs);
+				auto data = m_connector->get_instant_data(m_instrument_id);
 
-				m_cache.emplace_back(std::move(data));
-
-				if (m_cache.size() >= 1000)
 				{
-					flush_cache();
+					win::scoped_lock lock(m_cache_cs);
+
+					m_cache.emplace_back(std::move(data));
+
+					if (m_cache.size() >= 100)
+					{
+						flush_cache();
+					}
 				}
 			}
+			catch (const tbp::http_exception& ex)
+			{
+				LOG_ERR << L"Exception was thrown during HTTP request. Code: " << ex.code << L" Info: " << ex.what();
+			}
+			catch (const std::exception& ex)
+			{
+				LOG_ERR << L"Exception was thrown during retrieving data from server." << L" Info: " << ex.what();
+			}
+			catch (...)
+			{
+				LOG_ERR << L"Unknown error! Exception was thrown during retrieving data from server!";
+			}
 		}
+
+		// SB: flush all newly collected data
+		flush_cache();
 	}
 
 	void data_collector::flush_cache()
@@ -88,7 +108,6 @@ namespace tbp
 		, m_connector(connector)
 		, m_worker(std::bind(&data_collector::collect_data_thread, this))
 	{
-		//m_cache.reserve(10000);
 		m_start_evt.set();
 	}
 

@@ -4,10 +4,12 @@
 #include <core/data_storage.h>
 
 #include <common/constrains.h>
+#include <common/string_cvt.h>
 
 #include <string>
 #include <vector>
 #include <memory>
+#include <exception>
 
 namespace tbp
 {
@@ -29,6 +31,28 @@ namespace tbp
 	public:
 		virtual void close() = 0;
 		virtual void cancel() = 0;
+	};
+
+	struct http_exception : public std::exception
+	{
+		unsigned long code;
+
+	public:
+		http_exception(unsigned long code, const std::wstring& err_info)
+			: http_exception(code, sb::to_str(err_info))
+		{
+		}
+
+		http_exception(unsigned long code, const std::string& err_info)
+			: http_exception(code, err_info.c_str())
+		{
+		}
+
+		http_exception(unsigned long code, const char* err_info)
+			: code(code)
+			, std::exception(err_info)
+		{
+		}
 	};
 
 	struct connector : sb::dynamic

@@ -15,9 +15,20 @@ namespace tbp
 		LOG_INFO << "Starting application...";
 
 		m_storage = m_factory->create_storage();
+		
 		auto auth = m_factory->create_auth();
+		auth->login();
+
 		m_connector = m_factory->create_connector(auth);
-		//m_data_collector = std::make_shared<tbp::data_collector>(L"EUR_USR", m_connector, m_storage);
+
+		//auto start = std::chrono::system_clock::now() - std::chrono::hours(1);
+		//auto end = std::chrono::system_clock::now();
+		//m_connector->get_data(L"EUR_USD", &start, &end);
+
+		//m_connector->get_instruments();
+		//m_connector->get_instant_data(L"EUR_USD");
+
+		m_data_collector = std::make_shared<tbp::data_collector>(L"EUR_USD", m_connector, m_storage);
 
 		const auto main_thread_id = ::GetCurrentThreadId();
 		m_ui_thread = std::make_unique<std::thread>([main_thread_id]()

@@ -49,8 +49,6 @@ namespace tbp
 
 		void data_storage::create_db_schema()
 		{
-			sqlite::transaction t(m_db);
-
 			const auto version = m_db->schema_version();
 			switch (version)
 			{
@@ -64,23 +62,33 @@ namespace tbp
 				throw std::runtime_error("Unknown data storage DB schema version!");
 			}
 
-			LOG_INFO << "Oanda data storage DB schema is empty. Creating DB chema!";
+			sqlite::transaction t(m_db);
 
-			auto st = m_db->create_statement(L"CREATE TABLE [INSTRUMENTS]([ID] INTEGER PRIMARY KEY NOT NULL, [NAME] TEXT)");
-			st->step();
+			try
+			{
+				LOG_INFO << "Oanda data storage DB schema is empty. Creating DB chema!";
 
-			st = m_db->create_statement(L"CREATE TABLE [CANDLES]([ID] INTEGER PRIMARY KEY NOT NULL, [O_PRICE] DOUBLE, [H_PRICE] DOUBLE, [L_PRICE] DOUBLE, [C_PRICE] DOUBLE)");
-			st->step();
+				auto st = m_db->create_statement(L"CREATE TABLE [INSTRUMENTS]([ID] INTEGER PRIMARY KEY NOT NULL, [NAME] TEXT)");
+				st->step();
 
-			st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
-			st->step();
+				st = m_db->create_statement(L"CREATE TABLE [CANDLES]([ID] INTEGER PRIMARY KEY NOT NULL, [O_PRICE] DOUBLE, [H_PRICE] DOUBLE, [L_PRICE] DOUBLE, [C_PRICE] DOUBLE)");
+				st->step();
 
-			st = m_db->create_statement(L"CREATE TABLE [INSTANT_INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID] DOUBLE, [ASK] DOUBLE, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
-			st->step();
+				st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
+				st->step();
 
-			m_db->set_schema_version(current_schema_version);
+				st = m_db->create_statement(L"CREATE TABLE [INSTANT_INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID] DOUBLE, [ASK] DOUBLE, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
+				st->step();
 
-			t.commit();
+				m_db->set_schema_version(current_schema_version);
+
+				t.commit();
+			}
+			catch (...)
+			{
+				t.rollback();
+				throw;
+			}
 
 			LOG_INFO << "Oanda data storage DB schema has been created successfully!";
 		}

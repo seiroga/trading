@@ -5,6 +5,8 @@
 
 #include <common/string_cvt.h>
 
+#include <logging/log.h>
+
 #include <cpprest/http_client.h>
 #include <cpprest/producerconsumerstream.h>
 #include <cpprest/json.h>
@@ -13,6 +15,7 @@
 #include <time.h>
 
 #include <windows.h>
+#include <winhttp.h>
 
 namespace tbp
 {
@@ -24,6 +27,8 @@ namespace tbp
 		void authentication::login()
 		{
 			// Do nothing. We work through predefined access token
+
+			LOG_INFO << L"Login is not required. Work with access toked directly!";
 		}
 
 		std::wstring authentication::get_token() const
@@ -210,26 +215,45 @@ namespace tbp
 
 				web::json::value execute_request(const std::wstring& url) const
 				{
-					concurrency::streams::container_buffer<std::vector<tbp::byte_t>> buffer;
-
-					// Create http_client to send the request.
-					web::http::client::http_client client(url);
-					auto request = create_request(web::http::methods::GET);
-
-					// Handle response headers arriving.
-					auto requestTask = client.request(request).then([&](web::http::http_response response)
+					try
 					{
-						// Write response body into the file.
-						return response.body().read_to_end(buffer);
-					});
+						// Create http_client to send the request.
+						web::http::client::http_client client(url);
+						auto request = create_request(web::http::methods::GET);
 
-					// Wait for all the outstanding I/O to complete
-					requestTask.wait();
+						web::json::value json_responce;
+						std::exception_ptr exception;
 
-					std::wstring str_responce = sb::to_str(std::string(buffer.collection().begin(), buffer.collection().end()));
-					auto json_responce = web::json::value::parse(str_responce);
+						// Handle response headers arriving.
+						auto requestTask = client.request(request).then([&](web::http::http_response response)
+						{
+							if (HTTP_STATUS_OK != response.status_code())
+							{
+								exception = std::make_exception_ptr(http_exception(response.status_code(), response.reason_phrase()));
+							}
 
-					return json_responce;
+							// Write response body into the file.
+							return response.extract_json();
+
+						}).then([&](const web::json::value& response)
+						{
+							json_responce = response;
+						});
+
+						// Wait for all the outstanding I/O to complete
+						requestTask.wait();
+
+						if (nullptr != exception)
+						{
+							std::rethrow_exception(exception);
+						}
+
+						return json_responce;
+					}
+					catch (const web::http::http_exception& ex)
+					{
+						throw http_exception(ex.error_code().value(), ex.what());
+					}
 				}
 
 			private:
