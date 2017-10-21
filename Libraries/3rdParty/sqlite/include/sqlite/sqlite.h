@@ -100,6 +100,7 @@ namespace sqlite
 
 	class transaction : sb::noncopyable
 	{
+		bool m_closed;
 		const statement::ptr m_commit;
 		const statement::ptr m_rollback;
 
@@ -109,5 +110,6 @@ namespace sqlite
 
 	public:
 		transaction(const connection::ptr& db);
+		~transaction();
 	};
 }

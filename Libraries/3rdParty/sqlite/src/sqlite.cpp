@@ -204,19 +204,30 @@ namespace sqlite
 	void transaction::commit()
 	{
 		m_commit->step();
+		m_closed = true;
 	}
 
 	void transaction::rollback()
 	{
 		m_rollback->step();
+		m_closed = true;
 	}
 
 	transaction::transaction(const connection::ptr& db)
-		: m_commit(db->create_statement(L"COMMIT TRANSACTION"))
+		: m_closed(false)
+		, m_commit(db->create_statement(L"COMMIT TRANSACTION"))
 		, m_rollback(db->create_statement(L"ROLLBACK TRANSACTION"))
 	{
 		auto begin = db->create_statement(L"BEGIN TRANSACTION");
 		begin->step();
+	}
+
+	transaction::~transaction()
+	{
+		if (!m_closed)
+		{
+			abort();
+		}
 	}
 
 	//////////////////////////////////////////////////////////
