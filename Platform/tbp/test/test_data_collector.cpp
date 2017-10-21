@@ -106,12 +106,11 @@ BOOST_AUTO_TEST_CASE(data_collector_collect_data)
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
 
-	// ACT
 	bool data_arrived = ds->on_new_data.wait(2000);
 
 	// ASSERT
-	BOOST_ASSERT(!data_arrived);
-	BOOST_ASSERT(ds->values.size() == 0);
+	BOOST_ASSERT(data_arrived);
+	BOOST_ASSERT(!ds->instant_values.empty());
 	BOOST_ASSERT(!conn->instant_data_request_log.empty());
 
 	// ACT
@@ -119,10 +118,8 @@ BOOST_AUTO_TEST_CASE(data_collector_collect_data)
 	auto actual_end = actual_start;
 	dc->get_instant_data(L"instrument_1", &actual_start, &actual_end);
 	dc.reset();
-	data_arrived = ds->on_new_data.wait(2000);
 
 	// ASSERT
-	BOOST_ASSERT(data_arrived);
 	BOOST_ASSERT(!ds->instant_values.empty());
 	for (auto& val : ds->instant_values)
 	{
@@ -203,4 +200,30 @@ BOOST_AUTO_TEST_CASE(data_collector_get_instant_data)
 	BOOST_ASSERT(!conn->instant_data_request_log.empty());
 	BOOST_ASSERT(*conn->instant_data_request_log.begin() == L"instrument_1");
 	BOOST_ASSERT(*conn->instant_data_request_log.rbegin() == L"instrument_1");
+}
+
+BOOST_AUTO_TEST_CASE(data_collector_on_instant_data_signal)
+{
+	// INIT
+	auto ds = std::make_shared<mock_data_storage>();
+	auto conn = std::make_shared<mock_connector>();
+	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
+	conn->value = std::make_shared<tbp::data_t>(mock_data);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+
+	// ACT
+	bool signal_called = false;
+	std::wstring signal_instrument_id;
+	dc->on_instant_data.connect([&](const std::wstring& instrument_id, const std::vector<tbp::data_t::ptr>& data)
+	{
+		signal_called = true;
+		signal_instrument_id = instrument_id;
+	});
+
+	::Sleep(2000);
+	dc.reset();
+
+	// ASSERT
+	BOOST_ASSERT(signal_called);
+	BOOST_ASSERT(L"instrument_1" == signal_instrument_id);
 }

@@ -28,6 +28,9 @@ namespace tbp
 
 					if (m_cache.size() >= 100)
 					{
+						// SB: need to think when to call this signal, on each 100 vaues in cache or on each new data from server
+						on_instant_data(m_instrument_id, m_cache);
+
 						flush_cache();
 					}
 				}
