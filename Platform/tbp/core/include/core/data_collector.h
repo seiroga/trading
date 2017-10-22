@@ -5,8 +5,6 @@
 
 #include<win/thread.h>
 
-#include <boost/signals2.hpp>
-
 #include <thread>
 #include <string>
 
@@ -22,9 +20,6 @@ namespace tbp
 		const data_storage::ptr m_data_storage;
 		const tbp::connector::ptr m_connector;
 		std::thread m_worker;
-
-	public:
-		boost::signals2::signal<void (const std::wstring& instrument_id, const std::vector<data_t::ptr>&)> on_instant_data;
 
 	private:
 		void collect_data_thread();

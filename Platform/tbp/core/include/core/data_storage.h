@@ -4,6 +4,8 @@
 
 #include <common/constrains.h>
 
+#include <boost/signals2.hpp>
+
 #include <vector>
 #include <memory>
 
@@ -13,6 +15,9 @@ namespace tbp
 	{
 	public:
 		using ptr = std::shared_ptr<data_provider>;
+
+	public:
+		boost::signals2::signal<void(const std::wstring& instrument_id, const std::vector<data_t::ptr>&)> on_instant_data;
 
 	public:
 		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
