@@ -14,6 +14,9 @@
     <ClCompile Include="src\data_collector.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\settings.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\connector.h">
@@ -29,6 +32,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\core\factory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\settings.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

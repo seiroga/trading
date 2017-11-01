@@ -1,15 +1,19 @@
 #include <test_helpers/base_fixture.h>
 
 #include <win/exception.h>
+#include <win/fs.h>
 
 #include <vector>
 #include <algorithm>
 #include <memory>
+#include <fstream>
 
 #include <objbase.h>
 #include <comdef.h>
 
 #include <shlobj.h>
+
+using win::fs::operator/;
 
 namespace test_helpers
 {
@@ -57,6 +61,11 @@ namespace test_helpers
 
 			return path.substr(0, pos);
 		}
+
+		std::wstring get_data_root_path()
+		{
+			return get_module_directory() / L"test_data";
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////////
@@ -64,7 +73,7 @@ namespace test_helpers
 
 	std::wstring base_fixture::temp_folder::get_default_path()
 	{
-		return get_module_directory() + L"\\test_data";
+		return get_module_directory() / L"~temp";
 	}
 
 	base_fixture::temp_folder::temp_folder(const std::wstring& path /*= get_default_path()*/)
@@ -92,5 +101,15 @@ namespace test_helpers
 	std::wstring base_fixture::unique_string()
 	{
 		return generate_guid();
+	}
+
+	std::wstring base_fixture::get_file_path(const std::wstring& file_name)
+	{
+		return m_data_path / file_name;
+	}
+
+	base_fixture::base_fixture(const std::wstring& data_subfolder /*=L""*/)
+		: m_data_path(get_data_root_path() / data_subfolder)
+	{
 	}
 }

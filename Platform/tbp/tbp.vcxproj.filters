@@ -28,6 +28,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\connector_info.json" />
+    <CustomBuild Include="res\connector_info.json">
+      <Filter>res</Filter>
+    </CustomBuild>
+    <CustomBuild Include="res\app_settings.json">
+      <Filter>res</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

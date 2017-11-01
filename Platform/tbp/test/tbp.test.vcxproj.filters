@@ -8,6 +8,12 @@
     <Filter Include="src\oanda">
       <UniqueIdentifier>{9681b5ac-dcbf-4e88-b5b3-cea99cb49c88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{7fcabe51-6402-4366-aae9-efc304589459}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\data_collector">
+      <UniqueIdentifier>{83345d76-cb2b-490c-b4d9-638c1106a2a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_data_collector.cpp">
@@ -19,5 +25,8 @@
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="data\data_collector\app_settings.json" />
   </ItemGroup>
 </Project>

@@ -2,8 +2,11 @@
 
 #include <core/data_collector.h>
 
+#include <test_helpers/base_fixture.h>
+
 #include <algorithm>
 #include <functional>
+#include <fstream>
 
 namespace 
 {
@@ -95,16 +98,28 @@ namespace
 			return nullptr;
 		}
 	};
+
+	struct common_fixture : test_helpers::base_fixture
+	{
+		tbp::settings::ptr settings;
+
+	public:
+		common_fixture()
+			: base_fixture(L"data_collector")
+			, settings(tbp::settings::load_from_json(std::ifstream(get_file_path(L"app_settings.json"))))
+		{
+		}
+	};
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_collect_data)
+BOOST_FIXTURE_TEST_CASE(data_collector_collect_data, common_fixture)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
 	auto conn = std::make_shared<mock_connector>();
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
-	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 
 	bool data_arrived = ds->on_new_data.wait(2000);
 
@@ -127,27 +142,27 @@ BOOST_AUTO_TEST_CASE(data_collector_collect_data)
 	}
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_create_delete)
+BOOST_FIXTURE_TEST_CASE(data_collector_create_delete, common_fixture)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
 	auto conn = std::make_shared<mock_connector>();
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
-	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 
 	// ACT (no deadlock)
 	dc.reset();
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_request_data_from_connector_if_not_present_in_datastorage)
+BOOST_FIXTURE_TEST_CASE(data_collector_request_data_from_connector_if_not_present_in_datastorage, common_fixture)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
 	auto conn = std::make_shared<mock_connector>();
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
-	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 	const auto delta = std::chrono::system_clock::duration(10000);
 
 	// ACT
@@ -170,14 +185,14 @@ BOOST_AUTO_TEST_CASE(data_collector_request_data_from_connector_if_not_present_i
 	BOOST_ASSERT(conn->data_request_log[0].end == requested_end);
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_get_instant_data)
+BOOST_FIXTURE_TEST_CASE(data_collector_get_instant_data, common_fixture)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
 	auto conn = std::make_shared<mock_connector>();
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
-	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 	const auto delta = std::chrono::system_clock::duration(10000);
 
 	// ACT
@@ -202,14 +217,14 @@ BOOST_AUTO_TEST_CASE(data_collector_get_instant_data)
 	BOOST_ASSERT(*conn->instant_data_request_log.rbegin() == L"instrument_1");
 }
 
-BOOST_AUTO_TEST_CASE(data_collector_on_instant_data_signal)
+BOOST_FIXTURE_TEST_CASE(data_collector_on_instant_data_signal, common_fixture)
 {
 	// INIT
 	auto ds = std::make_shared<mock_data_storage>();
 	auto conn = std::make_shared<mock_connector>();
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
-	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", conn, ds);
+	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 
 	// ACT
 	bool signal_called = false;

@@ -74,6 +74,23 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjOutBinDir)connector_info.json</Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\app_settings.json">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">xcopy $(ProjectDir)res\app_settings.json $(ProjOutBinDir) /Y /F /i</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">xcopy $(ProjectDir)res\app_settings.json $(ProjOutBinDir) /Y /F /i</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">xcopy $(ProjectDir)res\app_settings.json $(ProjOutBinDir) /Y /F /i</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">xcopy $(ProjectDir)res\app_settings.json $(ProjOutBinDir) /Y /F /i</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjOutBinDir)app_settings.json</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjOutBinDir)app_settings.json</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjOutBinDir)app_settings.json</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjOutBinDir)app_settings.json</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5646713D-6722-4BA4-BDCF-00A206AFFAB3}</ProjectGuid>
@@ -142,12 +159,12 @@
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjOutBinDir)</OutDir>
     <IntDir>$(ProjIntDir)</IntDir>
   </PropertyGroup>

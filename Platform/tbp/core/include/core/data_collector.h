@@ -2,6 +2,7 @@
 
 #include <core/data_storage.h>
 #include <core/connector.h>
+#include <core/settings.h>
 
 #include<win/thread.h>
 
@@ -12,6 +13,7 @@ namespace tbp
 {
 	class data_collector : public data_provider
 	{
+		const size_t m_cache_size;
 		win::event m_start_evt;
 		win::event m_stop_evt;
 		win::critical_section m_cache_cs;
@@ -31,7 +33,7 @@ namespace tbp
 		virtual std::vector<data_t::ptr> get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
 
 	public:
-		data_collector(const std::wstring& instrument_id, const tbp::connector::ptr& connector, const data_storage::ptr& ds);
+		data_collector(const std::wstring& instrument_id, const settings::ptr& s, const tbp::connector::ptr& connector, const data_storage::ptr& ds);
 		~data_collector();
 	};
 }

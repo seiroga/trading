@@ -26,7 +26,7 @@ namespace tbp
 
 					m_cache.emplace_back(std::move(data));
 
-					if (m_cache.size() >= 100)
+					if (m_cache.size() >= m_cache_size)
 					{
 						// SB: need to think when to call this signal, on each 100 vaues in cache or on each new data from server
 						on_instant_data(m_instrument_id, m_cache);
@@ -103,8 +103,9 @@ namespace tbp
 		return result;
 	}
 
-	data_collector::data_collector(const std::wstring& instrument_id, const tbp::connector::ptr& connector, const data_storage::ptr& ds)
-		: m_start_evt(true, false)
+	data_collector::data_collector(const std::wstring& instrument_id, const settings::ptr& s, const tbp::connector::ptr& connector, const data_storage::ptr& ds)
+		: m_cache_size(get_value<int>(s, L"DataCollectorCacheSize", 100))
+		, m_start_evt(true, false)
 		, m_stop_evt(true, false)
 		, m_instrument_id(instrument_id)
 		, m_data_storage(ds)

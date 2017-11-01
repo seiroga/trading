@@ -44,7 +44,7 @@ int wmain()
 		const std::wstring working_dir = win::fs::get_current_module_dir();
 		logging::init(logging::level::debug, working_dir / L"Logs", true);
 
-		tbp::application app(tbp::get_broker_factory(L"OANDA", working_dir));
+		tbp::application app(tbp::get_broker_factory(L"OANDA", working_dir), working_dir);
 		app.start();
 	}
 	catch (const std::exception& ex)

@@ -6,8 +6,12 @@
 
 #include <windows.h>
 
+#include <fstream>
+
 namespace tbp
 {
+	using win::fs::operator/;
+
 	void application::start()
 	{
 		using win::fs::operator/;
@@ -28,8 +32,39 @@ namespace tbp
 		//m_connector->get_instruments();
 		//m_connector->get_instant_data(L"EUR_USD");
 
-		m_data_collector = std::make_shared<tbp::data_collector>(L"EUR_USD", m_connector, m_storage);
+		const auto working_instrument = get_working_instrument();
 
+		m_data_collector = std::make_shared<tbp::data_collector>(working_instrument, m_settings, m_connector, m_storage);
+
+		start_ui_thread();
+
+		LOG_INFO << "Application started successfully!";
+
+		pump();
+	}
+
+	std::wstring application::get_working_instrument()
+	{
+		const auto working_instrument = get_value<std::wstring>(m_settings, L"WorkingInstrument", L"EUR_USD");
+
+		LOG_INFO << "Applicaiton configured to work with: " << working_instrument;
+		LOG_INFO << "Verifying working instrument identifier...";
+
+		auto instruments = m_connector->get_instruments();
+
+		auto it = std::find(instruments.begin(), instruments.end(), working_instrument);
+		if (instruments.end() == it)
+		{
+			throw std::runtime_error("Instrument " + sb::to_str(working_instrument) + " isn't supported by broker!");
+		}
+
+		LOG_INFO << "Working instrument verfied successfully!";
+
+		return working_instrument;
+	}
+
+	void application::start_ui_thread()
+	{
 		const auto main_thread_id = ::GetCurrentThreadId();
 		m_ui_thread = std::make_unique<std::thread>([main_thread_id]()
 		{
@@ -40,9 +75,10 @@ namespace tbp
 
 			LOG_INFO << "Application was stopped by user request!";
 		});
+	}
 
-		LOG_INFO << "Application started successfully!";
-
+	void application::pump() const
+	{
 		BOOL res = 0;
 		MSG msg = { 0 };
 		while (0 != (res = ::GetMessageW(&msg, 0, 0, 0)))
@@ -57,8 +93,19 @@ namespace tbp
 		}
 	}
 
-	application::application(const factory::ptr& f)
+	settings::ptr application::load_settings(const std::wstring& path)
+	{
+		if (!win::fs::exists(path))
+		{
+			LOG_WARN << L"app_settings.json configuration file missing. Empty settings is used!";
+		}
+
+		return tbp::settings::load_from_json(std::ifstream(path));
+	}
+
+	application::application(const factory::ptr& f, const std::wstring& working_dir)
 		: m_factory(f)
+		, m_settings(load_settings(working_dir / L"app_settings.json"))
 	{
 	}
 

@@ -49,7 +49,7 @@ namespace tbp
 				std::wstring auth_token = oanda_cfg_root.at(L"auth_token").as_string();
 				std::wstring account_id = oanda_cfg_root.at(L"account_id").as_string();
 
-				LOG_INFO << L"Connector info has been load successfully!";
+				LOG_INFO << L"Connector info has been loaded successfully!";
 
 				return std::make_unique<connector_info>(connector_info{ url, auth_token, account_id });
 			}

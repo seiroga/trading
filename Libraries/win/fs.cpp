@@ -12,6 +12,11 @@ namespace win
 	{
 		std::wstring operator/(std::wstring lhs, std::wstring rhs)
 		{
+			if (rhs.empty())
+			{
+				return lhs;
+			}
+
 			const auto last_char = *lhs.rbegin();
 			if (last_char != L'\\' || last_char != L'/')
 			{

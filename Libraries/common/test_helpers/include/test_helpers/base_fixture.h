@@ -6,8 +6,11 @@
 
 namespace test_helpers
 {
-	struct base_fixture
+	class base_fixture
 	{
+		const std::wstring m_data_path;
+
+	public:
 		struct temp_folder
 		{
 			const std::wstring path;
@@ -20,7 +23,14 @@ namespace test_helpers
 			~temp_folder();
 		};
 
+	public:
 		static std::wstring unique_string();
+
+		std::wstring get_file_path(const std::wstring& file_name);
+		static std::wstring read_file_content(const std::wstring& file_path);
+
+	public:
+		base_fixture(const std::wstring& data_subfolder = L"");
 	};
 
 	struct temp_dir_fixture : base_fixture
