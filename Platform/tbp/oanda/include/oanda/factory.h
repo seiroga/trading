@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/factory.h>
+#include <core/settings.h>
 
 #include <memory>
 
@@ -10,11 +11,9 @@ namespace tbp
 	{
 		class factory : public tbp::factory
 		{
-			struct connector_info;
-
 		private:
 			const std::wstring m_working_dir;
-			const std::unique_ptr<connector_info> m_connector_cfg;
+			const settings::ptr m_connector_settings;
 
 		public:
 			virtual tbp::authentication::ptr create_auth() override;

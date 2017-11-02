@@ -348,10 +348,10 @@ namespace tbp
 				}
 
 			public:
-				connector_impl(const std::wstring& url, const std::wstring& account_id, const authentication::ptr& auth)
+				connector_impl(const settings::ptr& settings, const authentication::ptr& auth)
 					: m_token(auth->get_token())
-					, m_account_id(account_id)
-					, m_schema(url, L"v3")
+					, m_account_id(get_value<std::wstring>(settings, L"account_id"))
+					, m_schema(get_value<std::wstring>(settings, L"url"), L"v3")
 				{
 				}
 
@@ -364,9 +364,9 @@ namespace tbp
 		///////////////////////////////////////////////////////////////////////////////////////
 		// connector
 
-		tbp::connector::ptr connector::create(const std::wstring& url, const std::wstring& account_id, const authentication::ptr& auth)
+		tbp::connector::ptr connector::create(const settings::ptr& settings, const authentication::ptr& auth)
 		{
-			return std::make_shared<connector_impl>(url, account_id, auth);
+			return std::make_shared<connector_impl>(settings, auth);
 		}
 	}
 }

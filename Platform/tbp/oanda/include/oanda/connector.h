@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/connector.h>
+#include <core/settings.h>
 
 namespace tbp
 {
@@ -27,7 +28,7 @@ namespace tbp
 
 		struct connector
 		{
-			static tbp::connector::ptr create(const std::wstring& url, const std::wstring& account_id, const authentication::ptr& auth);
+			static tbp::connector::ptr create(const settings::ptr& settings, const authentication::ptr& auth);
 		};
 	}
 }
