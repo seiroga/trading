@@ -285,14 +285,14 @@ namespace tbp
 						const auto& candles_arr = json_responce.as_object().at(L"candles").as_array();
 						for (const auto& candle_data : candles_arr)
 						{
-							auto candle_info = std::make_shared<tbp::data_t>();
+							tbp::data_t candle_info;
 							const auto& candle_obj = candle_data.as_object();
-							candle_info->insert({ values::instrument_data::c_timestamp, parse_time(candle_obj.at(L"time")) });
-							candle_info->insert({ values::instrument_data::c_volume, static_cast<__int64>(candle_obj.at(L"volume").as_integer()) });
-							candle_info->insert({ values::instrument_data::c_bid_candlestick, parse_candle_object(candle_obj.at(L"bid").as_object()) });
-							candle_info->insert({ values::instrument_data::c_ask_candlestick, parse_candle_object(candle_obj.at(L"ask").as_object()) });
+							candle_info.insert({ values::instrument_data::c_timestamp, parse_time(candle_obj.at(L"time")) });
+							candle_info.insert({ values::instrument_data::c_volume, static_cast<__int64>(candle_obj.at(L"volume").as_integer()) });
+							candle_info.insert({ values::instrument_data::c_bid_candlestick, parse_candle_object(candle_obj.at(L"bid").as_object()) });
+							candle_info.insert({ values::instrument_data::c_ask_candlestick, parse_candle_object(candle_obj.at(L"ask").as_object()) });
 
-							result.push_back(candle_info);
+							result.emplace_back(std::make_shared<tbp::data_t>(std::move(candle_info)));
 						}
 					}
 
@@ -318,28 +318,28 @@ namespace tbp
 				{
 					auto json_responce = execute_request(m_schema.get_instant_prices_url(m_account_id, { instrument_id }));
 
-					auto result = std::make_shared<tbp::data_t>();
+					tbp::data_t result;
 					auto prices = json_responce.at(L"prices").as_array();
 					for (const auto& price_info : prices)
 					{
-						result->emplace(tbp::oanda::values::instrument_data::c_timestamp, to_time(price_info.at(L"time").as_string()));
+						result.emplace(tbp::oanda::values::instrument_data::c_timestamp, to_time(price_info.at(L"time").as_string()));
 
 						{
 							// ask price
 							// read first one from array
 							auto ask_prices = price_info.at(L"asks").as_array();
-							result->emplace(tbp::oanda::values::instant_data::c_ask_price, ask_prices.size() > 0 ? to_double(ask_prices.at(0).at(L"price").as_string()) : 0.0);
+							result.emplace(tbp::oanda::values::instant_data::c_ask_price, ask_prices.size() > 0 ? to_double(ask_prices.at(0).at(L"price").as_string()) : 0.0);
 						}
 
 						{
 							// bid price
 							// read first one from array
 							auto bid_prices = price_info.at(L"bids").as_array();
-							result->emplace(tbp::oanda::values::instant_data::c_bid_price, bid_prices.size() > 0 ? to_double(bid_prices.at(0).at(L"price").as_string()) : 0.0);
+							result.emplace(tbp::oanda::values::instant_data::c_bid_price, bid_prices.size() > 0 ? to_double(bid_prices.at(0).at(L"price").as_string()) : 0.0);
 						}
 					}
 
-					return result;
+					return std::make_shared<tbp::data_t>(std::move(result));
 				}
 
 				virtual order::ptr create_order(const data_t& params) override
