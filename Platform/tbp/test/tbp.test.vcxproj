@@ -104,7 +104,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;$(ProjRootDir)Platform\tbp\test\mock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);_NO_ASYNCRTIMP</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -118,7 +118,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;$(ProjRootDir)Platform\tbp\test\mock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions);_NO_ASYNCRTIMP</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -134,7 +134,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;$(ProjRootDir)Platform\tbp\test\mock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions);_NO_ASYNCRTIMP</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -152,7 +152,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjRootDir)Platform\tbp\src;$(ProjRootDir)Platform\tbp\include;$(ProjRootDir)Libraries\common\include;$(ProjRootDir)Libraries\3rdParty;$(ProjRootDir)Libraries\win\include;$(ProjRootDir)Platform\tbp\core\include;$(ProjRootDir)Platform\tbp\oanda\include;$(ProjRootDir)Libraries\3rdParty\sqlite\include;$(ProjRootDir)Libraries\common\test_helpers\include;$(ProjRootDir)Platform\tbp\test\mock\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions);_NO_ASYNCRTIMP</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="oanda\test_data_storage.cpp" />
+    <ClCompile Include="oanda\test_trader.cpp" />
     <ClCompile Include="test_data_collector.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -219,6 +220,9 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjOutBinDir)test_data\data_collector\app_settings.json</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mock\include\mock\mock_connector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

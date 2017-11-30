@@ -1,5 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
+#include <mock/mock_connector.h>
+
 #include <core/data_collector.h>
 
 #include <test_helpers/base_fixture.h>
@@ -61,44 +63,6 @@ namespace
 		}
 	};
 
-	struct mock_connector : public tbp::connector
-	{
-		struct request_info
-		{
-			const std::wstring instrument_id;
-			const tbp::time_t start;
-			const tbp::time_t end;
-		};
-
-		tbp::data_t::ptr value;
-		mutable std::vector<request_info> data_request_log;
-		mutable std::vector<std::wstring> instant_data_request_log;
-
-		virtual std::vector<std::wstring> get_instruments() const override
-		{
-			return { L"" };
-		}
-
-		virtual tbp::data_t::ptr get_instant_data(const std::wstring& instrument_id) override
-		{
-			instant_data_request_log.emplace_back(instrument_id);
-
-			return value;
-		}
-
-		virtual std::vector<tbp::data_t::ptr> get_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
-		{
-			data_request_log.push_back({ instrument_id, *start_datetime, *end_datetime });
-			
-			return { value };
-		}
-
-		virtual tbp::order::ptr create_order(const tbp::data_t& params) override
-		{
-			return nullptr;
-		}
-	};
-
 	struct common_fixture : test_helpers::base_fixture
 	{
 		tbp::settings::ptr settings;
@@ -120,6 +84,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_collect_data, common_fixture)
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
+	dc->start();
 
 	bool data_arrived = ds->on_new_data.wait(2000);
 
@@ -150,6 +115,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_create_delete, common_fixture)
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
+	dc->start();
 
 	// ACT (no deadlock)
 	dc.reset();
@@ -164,6 +130,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_request_data_from_connector_if_not_presen
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 	const auto delta = std::chrono::system_clock::duration(10000);
+	dc->start();
 
 	// ACT
 	ds->start = std::chrono::system_clock::now();
@@ -194,6 +161,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_get_instant_data, common_fixture)
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
 	const auto delta = std::chrono::system_clock::duration(10000);
+	dc->start();
 
 	// ACT
 	::Sleep(1000);
@@ -225,6 +193,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_on_instant_data_signal, common_fixture)
 	tbp::data_t mock_data({ { L"some_key", tbp::value_t(false) } });
 	conn->value = std::make_shared<tbp::data_t>(mock_data);
 	auto dc = std::make_unique<tbp::data_collector>(L"instrument_1", settings, conn, ds);
+	dc->start();
 
 	// ACT
 	bool signal_called = false;

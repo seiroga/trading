@@ -41,6 +41,8 @@ int wmain()
 	{
 		using win::fs::operator/;
 
+		// TODO: load settings here instead of inside of application object.
+		// Add logging level to app_settings.json
 		const std::wstring working_dir = win::fs::get_current_module_dir();
 		logging::init(logging::level::debug, working_dir / L"Logs", true);
 

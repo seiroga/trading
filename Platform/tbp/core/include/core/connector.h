@@ -13,6 +13,9 @@
 
 namespace tbp
 {
+	/////////////////////////////////////////////////////////////////////
+	// authentication
+
 	struct authentication : sb::dynamic
 	{
 	public:
@@ -23,15 +26,52 @@ namespace tbp
 		virtual std::wstring get_token() const = 0;
 	};
 
+	/////////////////////////////////////////////////////////////////////
+	// order
+
 	struct order : sb::dynamic
 	{
 	public:
 		using ptr = std::shared_ptr<order>;
 
+		enum class state_t
+		{
+			pending,
+			filled,
+			canceled
+		};
+
 	public:
-		virtual void close() = 0;
+		virtual std::wstring id() const = 0;
+		virtual std::wstring trade_id() const = 0;
+		virtual state_t state() const = 0;
 		virtual void cancel() = 0;
 	};
+
+	/////////////////////////////////////////////////////////////////////
+	// trade
+
+	struct trade : sb::dynamic
+	{
+	public:
+		using ptr = std::shared_ptr<trade>;
+
+		enum class state_t
+		{
+			opened,
+			closed
+		};
+
+	public:
+		virtual std::wstring id() const = 0;
+		virtual state_t state() const = 0;
+		virtual long amount() const = 0;
+		virtual double current_profit() const = 0;
+		virtual void close(unsigned long amount_to_close = -1L) = 0;
+	};
+
+	/////////////////////////////////////////////////////////////////////
+	// http exception
 
 	struct http_exception : public std::exception
 	{
@@ -55,6 +95,9 @@ namespace tbp
 		}
 	};
 
+	/////////////////////////////////////////////////////////////////////
+	// connector
+
 	struct connector : sb::dynamic
 	{
 	public:
@@ -65,5 +108,7 @@ namespace tbp
 		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
 		virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) = 0;
 		virtual order::ptr create_order(const data_t& params) = 0;
+		virtual order::ptr find_order(const std::wstring& id) const = 0;
+		virtual trade::ptr find_trade(const std::wstring& id) const = 0;
 	};
 }

@@ -166,11 +166,13 @@
     <ClCompile Include="src\connector.cpp" />
     <ClCompile Include="src\data_storage.cpp" />
     <ClCompile Include="src\factory.cpp" />
+    <ClCompile Include="src\trader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\oanda\connector.h" />
     <ClInclude Include="include\oanda\data_storage.h" />
     <ClInclude Include="include\oanda\factory.h" />
+    <ClInclude Include="include\oanda\trader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

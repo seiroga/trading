@@ -14,6 +14,12 @@
     <Filter Include="data\data_collector">
       <UniqueIdentifier>{83345d76-cb2b-490c-b4d9-638c1106a2a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{174287ef-8f7d-41be-be0c-05f042b4b092}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\mock">
+      <UniqueIdentifier>{5e10cb38-1dd5-4d68-8d59-7e2ef8270fe0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="test_data_collector.cpp">
@@ -25,8 +31,18 @@
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="oanda\test_trader.cpp">
+      <Filter>src\oanda</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="data\data_collector\app_settings.json" />
+    <CustomBuild Include="data\data_collector\app_settings.json">
+      <Filter>data\data_collector</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mock\include\mock\mock_connector.h">
+      <Filter>include\mock</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

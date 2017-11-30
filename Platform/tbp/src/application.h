@@ -15,6 +15,7 @@ namespace tbp
 		data_storage::ptr m_storage;
 		connector::ptr m_connector;
 		data_collector::ptr m_data_collector;
+		std::shared_ptr<sb::dynamic> m_trader;
 		std::unique_ptr<std::thread> m_ui_thread;
 
 	private:

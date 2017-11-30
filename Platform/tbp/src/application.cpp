@@ -25,16 +25,17 @@ namespace tbp
 
 		m_connector = m_factory->create_connector(auth);
 
-		//auto start = std::chrono::system_clock::now() - std::chrono::hours(1);
-		//auto end = std::chrono::system_clock::now();
-		//m_connector->get_data(L"EUR_USD", &start, &end);
-
-		//m_connector->get_instruments();
-		//m_connector->get_instant_data(L"EUR_USD");
-
 		const auto working_instrument = get_working_instrument();
 
 		m_data_collector = std::make_shared<tbp::data_collector>(working_instrument, m_settings, m_connector, m_storage);
+
+		// SB: create strategy
+		// ...........
+
+		// SB: create trader
+		m_trader = m_factory->create_trader(m_connector, nullptr /*<--- !!!! need to pass real strategy instead of nullptr !!!*/);
+
+		m_data_collector->start();
 
 		start_ui_thread();
 

@@ -347,6 +347,16 @@ namespace tbp
 					return nullptr;
 				}
 
+				virtual order::ptr find_order(const std::wstring& id) const override
+				{
+					return nullptr;
+				}
+
+				virtual trade::ptr find_trade(const std::wstring& id) const override
+				{
+					return nullptr;
+				}
+
 			public:
 				connector_impl(const settings::ptr& settings, const authentication::ptr& auth)
 					: m_token(auth->get_token())
@@ -359,6 +369,21 @@ namespace tbp
 				{
 				}
 			};
+		}
+
+		///////////////////////////////////////////////////////////////////////////////////////
+		// market order params
+
+		data_t create_market_order_params(const std::wstring& instrument_id, long amount)
+		{
+			data_t params;
+			params[L"units"] = __int64(amount);
+			params[L"instument"] = instrument_id;
+			params[L"timeInForce"] = std::wstring(L"FOK");
+			params[L"type"] = std::wstring(L"MARKET");
+			params[L"positionFill"] = std::wstring(L"DEFAULT");
+
+			return params;
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////

@@ -103,6 +103,13 @@ namespace tbp
 		return result;
 	}
 
+	void data_collector::start()
+	{
+		m_start_evt.set();
+
+		LOG_DBG << L"Data collector has been started!";
+	}
+
 	data_collector::data_collector(const std::wstring& instrument_id, const settings::ptr& s, const tbp::connector::ptr& connector, const data_storage::ptr& ds)
 		: m_cache_size(get_value<int>(s, L"DataCollectorCacheSize", 100))
 		, m_start_evt(true, false)
@@ -112,12 +119,13 @@ namespace tbp
 		, m_connector(connector)
 		, m_worker(std::bind(&data_collector::collect_data_thread, this))
 	{
-		m_start_evt.set();
 	}
 
 	data_collector::~data_collector()
 	{
 		m_stop_evt.set();
 		m_worker.join();
+
+		LOG_DBG << L"Data collector has been shutdown!";
 	}
 }

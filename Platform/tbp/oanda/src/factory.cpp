@@ -1,6 +1,7 @@
 #include <oanda/factory.h>
 #include <oanda/data_storage.h>
 #include <oanda/connector.h>
+#include <oanda/trader.h>
 
 #include <common/string_cvt.h>
 
@@ -75,6 +76,11 @@ namespace tbp
 			LOG_INFO << "OANDA database connection created successfully.";
 
 			return std::make_shared<oanda::data_storage>(db);
+		}
+
+		std::shared_ptr<sb::dynamic> factory::create_trader(const tbp::connector::ptr& c, const strategy::ptr& st)
+		{
+			return std::make_shared<oanda::trader>(c, st, m_working_dir);
 		}
 
 		factory::ptr factory::create(const std::wstring& working_dir)

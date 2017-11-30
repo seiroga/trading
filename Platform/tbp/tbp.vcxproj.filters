@@ -23,16 +23,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\application.h">
-      <Filter>src</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="res\connector_info.json">
       <Filter>res</Filter>
     </CustomBuild>
     <CustomBuild Include="res\app_settings.json">
       <Filter>res</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\application.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
