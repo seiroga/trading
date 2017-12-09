@@ -29,11 +29,11 @@ namespace tbp
 
 		m_data_collector = std::make_shared<tbp::data_collector>(working_instrument, m_settings, m_connector, m_storage);
 
+		// SB: create trader
+		m_trader = m_factory->create_trader(m_connector);
+
 		// SB: create strategy
 		// ...........
-
-		// SB: create trader
-		m_trader = m_factory->create_trader(m_connector, nullptr /*<--- !!!! need to pass real strategy instead of nullptr !!!*/);
 
 		m_data_collector->start();
 

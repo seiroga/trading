@@ -40,5 +40,8 @@
     <ClInclude Include="include\core\strategy.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\core\trader.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@ namespace win
 			if (INVALID_FILE_ATTRIBUTES == res)
 			{
 				auto last_err = ::GetLastError();
-				if (ERROR_FILE_NOT_FOUND == last_err)
+				if (ERROR_FILE_NOT_FOUND == last_err || ERROR_PATH_NOT_FOUND == last_err)
 				{
 					return false;
 				}

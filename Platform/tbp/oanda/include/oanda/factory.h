@@ -19,7 +19,7 @@ namespace tbp
 			virtual tbp::authentication::ptr create_auth() override;
 			virtual tbp::connector::ptr create_connector(const authentication::ptr& auth) override;
 			virtual tbp::data_storage::ptr create_storage() override;
-			virtual std::shared_ptr<sb::dynamic> create_trader(const tbp::connector::ptr& c, const strategy::ptr& st) override;
+			virtual tbp::trader::ptr create_trader(const tbp::connector::ptr& c) override;
 
 		public:
 			static ptr create(const std::wstring& working_dir);

@@ -45,6 +45,7 @@ namespace tbp
 				const auto exists = win::fs::exists(db_path);
 				LOG_INFO << (exists ? L"Open existing trading DB..." : L"Creating trading DB...");
 
+				win::fs::create_path(db_path.substr(0, db_path.find_last_of(L"\\")));
 				auto db = sqlite::connection::create(db_path);
 
 				LOG_INFO << L"Successfully connected to trading DB!";
@@ -76,10 +77,10 @@ namespace tbp
 					auto st = m_db->create_statement(L"CREATE TABLE [IDS]([ID] INTEGER PRIMARY KEY NOT NULL, [LOCAL_ID] TEXT, [REMOTE_ID] TEXT)");
 					st->step();
 
-					st = m_db->create_statement(L"CREATE TABLE [ORDERS]([ID] REFERENCES IDS(ID) ON DELETE CASCADE, [CREATED] INTEGER, [PROCESSED] INTEGER, [STATE] INTEGER, [LINKED_TRADE] REFERENCES IDS(ID) ON DELETE SET NULL, PRIMARY KEY [ID])");
+					st = m_db->create_statement(L"CREATE TABLE [ORDERS]([ID] REFERENCES IDS(ID) ON DELETE CASCADE, [CREATED] INTEGER, [PROCESSED] INTEGER, [STATE] INTEGER, [LINKED_TRADE] REFERENCES IDS(ID))");
 					st->step();
 
-					st = m_db->create_statement(L"CREATE TABLE [TRADES]([ID] REFERENCES IDS(ID) ON DELETE CASCADE, [OPENED] INTEGER, [STATE] INTEGER, [LINKED_ORDER] REFERENCES IDS(ID) ON DELETE SET NULL, PRIMARY KEY [ID])");
+					st = m_db->create_statement(L"CREATE TABLE [TRADES]([ID] REFERENCES IDS(ID) ON DELETE CASCADE, [OPENED] INTEGER, [STATE] INTEGER, [LINKED_ORDER] REFERENCES IDS(ID))");
 					st->step();
 
 					m_db->set_schema_version(current_schema_version);
@@ -184,74 +185,93 @@ namespace tbp
 
 				st->bind_value(internal_id, 1);
 
-				return st->step() ? st->get_value<std::wstring>(1) : L"";
+				if (!st->step())
+				{
+					throw std::runtime_error("Could not find remote ID by internal ID! InternalID: " + sb::to_str(internal_id));
+				}
+				{
+					return st->get_value<std::wstring>(0);
+				}
 			}
 
 			void register_order(const std::wstring& internal_id, const tbp::order::ptr& order, const tbp::trade::ptr& linked_trade)
 			{
-				auto insert_into_ids = [this](const auto& internal_id, const auto& remote_id)
+				sqlite::transaction t(m_db);
+
+				try
 				{
-					auto st = m_db->create_statement(LR"(
-						INSERT OR FAIL INTO IDS(LOCAL_ID, REMOTE_ID)
-						VALUES (?1, ?2)
-						)");
+					auto insert_into_ids = [this](const auto& internal_id, const auto& remote_id)
+					{
+						auto st = m_db->create_statement(LR"(
+							INSERT OR FAIL INTO IDS(LOCAL_ID, REMOTE_ID)
+							VALUES (?1, ?2)
+							)");
 
-					st->bind_value(internal_id, 1);
-					st->bind_value(remote_id, 2);
+						st->bind_value(internal_id, 1);
+						st->bind_value(remote_id, 2);
 
-					st->step();
+						st->step();
 
-					return st->last_insert_row_id();
-				};
+						return st->last_insert_row_id();
+					};
 
-				// SB: insert order into IDS
-				const __int64 order_ids_row_id = insert_into_ids(internal_id, order->id());
-				
-				// SB: insert into TRADES
-				__int64 trade_ids_row_id = 0;
-				if (nullptr != linked_trade)
-				{
-					// SB: insert trade into IDS
-					trade_ids_row_id = insert_into_ids(internal_id, linked_trade->id());
+					// SB: insert order into IDS
+					const __int64 order_ids_row_id = insert_into_ids(internal_id, order->id());
 
-					auto st = m_db->create_statement(LR"(
-						INSERT OR FAIL INTO TRADES(OPENED, STATE, LINKED_ORDER)
-						VALUES (?1, ?2, ?3)
-						)");
+					// SB: insert into TRADES
+					__int64 trade_ids_row_id = 0;
+					if (nullptr != linked_trade)
+					{
+						// SB: insert trade into IDS
+						trade_ids_row_id = insert_into_ids(linked_trade->id(), linked_trade->id());
 
-					const auto open_time = std::chrono::system_clock::now().time_since_epoch().count();
-					st->bind_value(open_time, 1);
-					st->bind_value(int(order->state()), 2);
-					st->bind_value(order_ids_row_id, 3);
+						auto st = m_db->create_statement(LR"(
+							INSERT OR FAIL INTO TRADES(OPENED, STATE, LINKED_ORDER)
+							VALUES (?1, ?2, ?3)
+							)");
 
-					st->step();
+						const auto open_time = std::chrono::system_clock::now().time_since_epoch().count();
+						st->bind_value(open_time, 1);
+						st->bind_value(int(order->state()), 2);
+						st->bind_value(order_ids_row_id, 3);
+
+						st->step();
+					}
+
+					// SB: insert into ORDERS
+					{
+						auto st = m_db->create_statement(LR"(
+							INSERT OR FAIL INTO ORDERS(CREATED, PROCESSED, STATE, LINKED_TRADE)
+							VALUES (?1, ?2, ?3, ?4)
+							)");
+
+						const auto creation_time = std::chrono::system_clock::now().time_since_epoch().count();
+						st->bind_value(creation_time, 1);
+
+						const auto state = order->state();
+						if (tbp::order::state_t::filled == state || tbp::order::state_t::canceled == state)
+						{
+							st->bind_value(creation_time, 2);
+						}
+						else
+						{
+							// SB: order is in pending state
+							st->bind_value(sqlite::vnull, 2);
+						}
+
+						st->bind_value(int(state), 3);
+						st->bind_value(nullptr != linked_trade ? sqlite::value_t(trade_ids_row_id) : sqlite::vnull, 4);
+
+						st->step();
+					}
+
+					t.commit();
 				}
-
-				// SB: insert into ORDERS
+				catch (...)
 				{
-					auto st = m_db->create_statement(LR"(
-						INSERT OR FAIL INTO ORDERS(CREATED, PROCESSED, STATE, LINKED_TRADE)
-						VALUES (?1, ?2, ?3, ?4)
-						)");
+					t.rollback();
 
-					const auto creation_time = std::chrono::system_clock::now().time_since_epoch().count();
-					st->bind_value(creation_time, 1);
-
-					const auto state = order->state();
-					if (tbp::order::state_t::filled == state || tbp::order::state_t::canceled == state)
-					{
-						st->bind_value(creation_time, 2);
-					}
-					else
-					{
-						// SB: order is in pending state
-						st->bind_value(sqlite::vnull, 2);
-					}
-
-					st->bind_value(int(state), 3);
-					st->bind_value(nullptr != linked_trade ? sqlite::value_t(trade_ids_row_id) : sqlite::vnull, 4);
-
-					st->step();
+					throw;
 				}
 			}
 
@@ -270,7 +290,7 @@ namespace tbp
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// trader implementation
 
-		void trader::on_open_trade(const std::wstring& instrument_id, long amount, strategy::trade_id_t internal_id)
+		void trader::open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id)
 		{
 			// SB: create MarketOrder request
 			auto order = m_connector->create_order(create_market_order_params(instrument_id, amount));
@@ -278,7 +298,7 @@ namespace tbp
 			m_db->register_order(internal_id, order, trade);
 		}
 
-		void trader::on_close_trade(strategy::trade_id_t internal_id, long amount)
+		void trader::close_trade(const std::wstring& internal_id, long amount)
 		{
 			const auto remote_id = m_db->get_remote_id(internal_id);
 			auto order = m_connector->find_order(remote_id);
@@ -392,33 +412,23 @@ namespace tbp
 			// SB: need to think what to do with opened trades
 		}
 
-		trader::trader(const tbp::connector::ptr& c, const strategy::ptr& st, const std::wstring& working_dir)
+		trader::trader(const tbp::connector::ptr& c, const std::wstring& working_dir)
 			: m_connector(c)
-			, m_strategy(st)
 			, m_db(std::make_unique<trading_db>(get_db_path(working_dir)))
 		{
-			if (nullptr == m_connector || nullptr == m_strategy)
+			if (nullptr == m_connector)
 			{
-				throw std::invalid_argument("Connector or strategy object is empty!");
+				throw std::invalid_argument("Connector object is empty!");
 			}
 
 			update_objects_states();
 
 			// SB: this should be done by strategy
 			//cancel_all_pending_tasks();
-
-			m_on_open_trade_connection = m_strategy->on_open_trade.connect(std::bind(&trader::on_open_trade, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-			m_on_close_trade_connection = m_strategy->on_close_trade.connect(std::bind(&trader::on_close_trade, this, std::placeholders::_1, std::placeholders::_2));
-
-			m_strategy->start();
 		}
 
 		trader::~trader()
 		{
-			m_strategy->stop();
-
-			m_on_open_trade_connection.disconnect();
-			m_on_close_trade_connection.disconnect();
 		}
 	}
 }

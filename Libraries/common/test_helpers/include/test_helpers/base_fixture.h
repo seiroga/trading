@@ -37,9 +37,12 @@ namespace test_helpers
 	{
 		temp_folder data_root;
 
-		temp_dir_fixture()
-			: data_root(temp_folder::get_default_path())
+		temp_dir_fixture(const std::wstring& data_subfolder = L"")
+			: base_fixture(data_subfolder)
+			, data_root(temp_folder::get_default_path())
 		{
 		}
 	};
 }
+
+#define BOOST_ASSERT_EXCEPT(expr, exception) { bool exception_was_thrown = false; try { expr; } catch(const exception&) { exception_was_thrown = true; } BOOST_ASSERT(exception_was_thrown); }

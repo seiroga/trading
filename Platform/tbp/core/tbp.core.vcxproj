@@ -149,6 +149,7 @@
     <ClInclude Include="include\core\primitives.h" />
     <ClInclude Include="include\core\settings.h" />
     <ClInclude Include="include\core\strategy.h" />
+    <ClInclude Include="include\core\trader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,7 +4,7 @@
 #include <core/data_storage.h>
 #include <core/data_collector.h>
 #include <core/connector.h>
-#include <core/strategy.h>
+#include <core/trader.h>
 
 #include <common/constrains.h>
 
@@ -19,6 +19,6 @@ namespace tbp
 		virtual authentication::ptr create_auth() = 0;
 		virtual connector::ptr create_connector(const authentication::ptr& auth) = 0;
 		virtual data_storage::ptr create_storage() = 0;
-		virtual std::shared_ptr<sb::dynamic> create_trader(const tbp::connector::ptr& c, const strategy::ptr& st) = 0;
+		virtual trader::ptr create_trader(const tbp::connector::ptr& c) = 0;
 	};
 }

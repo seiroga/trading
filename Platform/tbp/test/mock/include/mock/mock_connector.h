@@ -110,6 +110,9 @@ public:
 
 struct mock_connector : public tbp::connector
 {
+public:
+	using ptr = std::shared_ptr<mock_connector>;
+
 	struct request_info
 	{
 		const std::wstring instrument_id;
@@ -117,12 +120,15 @@ struct mock_connector : public tbp::connector
 		const tbp::time_t end;
 	};
 
+public:
 	tbp::data_t::ptr value;
 	mutable std::vector<request_info> data_request_log;
 	mutable std::vector<std::wstring> instant_data_request_log;
 	std::vector<std::shared_ptr<mock_order>> orders_log;
 	std::vector<std::shared_ptr<mock_trade>> trades_log;
+	bool fill_order_after_creation = false;
 
+public:
 	virtual std::vector<std::wstring> get_instruments() const override
 	{
 		return { L"" };
@@ -146,6 +152,11 @@ struct mock_connector : public tbp::connector
 	{
 		auto mo = std::make_shared<mock_order>(params);
 		orders_log.push_back(mo);
+		if (fill_order_after_creation)
+		{
+			mo->fill_order();
+			create_trade(mo);
+		}
 
 		return mo;
 	}
@@ -165,6 +176,21 @@ struct mock_connector : public tbp::connector
 
 	virtual tbp::trade::ptr find_trade(const std::wstring& id) const override
 	{
+		for (const auto& trade : trades_log)
+		{
+			if (id == trade->remote_id)
+			{
+				return trade;
+			}
+		}
+
 		return nullptr;
+	}
+
+	tbp::trade::ptr create_trade(const std::shared_ptr<mock_order>& parent_order)
+	{
+		trades_log.push_back(std::make_shared<mock_trade>(parent_order->linked_trade_id, tbp::trade::state_t::opened));
+
+		return trades_log.back();
 	}
 };

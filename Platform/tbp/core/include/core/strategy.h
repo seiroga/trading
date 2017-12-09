@@ -13,11 +13,6 @@ namespace tbp
 	{
 	public:
 		using ptr = std::shared_ptr<strategy>;
-		using trade_id_t = std::wstring;
-
-	public:
-		boost::signals2::signal<void (const std::wstring& instrument_id, long amount, trade_id_t trade_id)> on_open_trade;
-		boost::signals2::signal<void (trade_id_t trade_id, long amount)> on_close_trade;
 
 	public:
 		virtual void start() = 0;
