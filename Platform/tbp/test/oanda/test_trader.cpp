@@ -214,3 +214,42 @@ BOOST_FIXTURE_TEST_CASE(trader_close_not_opened_trade, common_fixture)
 	BOOST_ASSERT(connector->orders_log.size() == 0);
 	BOOST_ASSERT(connector->trades_log.size() == 0);
 }
+
+BOOST_FIXTURE_TEST_CASE(trader_close_all_pending_trades, common_fixture)
+{
+	// INIT
+	temp_folder working_dir;
+	mock_connector::ptr connector = std::make_shared<mock_connector>();
+	connector->fill_order_after_creation = true;
+	tbp::oanda::trader trader(connector, working_dir.path);
+
+	BOOST_ASSERT(connector->orders_log.size() == 0);
+	BOOST_ASSERT(connector->trades_log.size() == 0);
+
+	// ACT
+	trader.open_trade(L"EUR_USD", 2000, unique_string());
+
+	connector->fill_order_after_creation = false;
+	trader.open_trade(L"EUR_USD", 2000, unique_string());
+
+	// ASSERT
+	BOOST_ASSERT(connector->orders_log.size() == 2);
+	BOOST_ASSERT(connector->trades_log.size() == 1);
+
+	BOOST_ASSERT(connector->orders_log[0]->state() == tbp::order::state_t::filled);
+	BOOST_ASSERT(connector->orders_log[1]->state() == tbp::order::state_t::pending);
+
+	BOOST_ASSERT(connector->trades_log.back()->state() == tbp::trade::state_t::opened);
+
+	// ACT
+	trader.close_pending_trades();
+
+	// ASSERT
+	BOOST_ASSERT(connector->orders_log.size() == 2);
+	BOOST_ASSERT(connector->trades_log.size() == 1);
+
+	BOOST_ASSERT(connector->orders_log[0]->state() == tbp::order::state_t::filled);
+	BOOST_ASSERT(connector->orders_log[1]->state() == tbp::order::state_t::canceled);
+
+	BOOST_ASSERT(connector->trades_log.back()->state() == tbp::trade::state_t::closed);
+}

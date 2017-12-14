@@ -15,7 +15,6 @@ namespace tbp
 	public:
 		virtual void open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id) = 0;
 		virtual void close_trade(const std::wstring& internal_id, long amount) = 0;
-		virtual void update_objects_states() = 0;
-		virtual void cancel_all_pending_tasks() = 0;
+		virtual void close_pending_trades() = 0;
 	};
 }

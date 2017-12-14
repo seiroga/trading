@@ -17,11 +17,13 @@ namespace tbp
 			const tbp::connector::ptr m_connector;
 			const std::unique_ptr<trading_db> m_db;
 
+		private:
+			void update_objects_states();
+
 		public:
 			virtual void open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id) override;
 			virtual void close_trade(const std::wstring& internal_id, long amount) override;
-			virtual void update_objects_states() override;
-			virtual void cancel_all_pending_tasks() override;
+			virtual void close_pending_trades() override;
 
 		public:
 			trader(const tbp::connector::ptr& c, const std::wstring& working_dir);

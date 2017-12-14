@@ -226,14 +226,15 @@ namespace tbp
 						trade_ids_row_id = insert_into_ids(linked_trade->id(), linked_trade->id());
 
 						auto st = m_db->create_statement(LR"(
-							INSERT OR FAIL INTO TRADES(OPENED, STATE, LINKED_ORDER)
-							VALUES (?1, ?2, ?3)
+							INSERT OR FAIL INTO TRADES(ID, OPENED, STATE, LINKED_ORDER)
+							VALUES (?1, ?2, ?3, ?4)
 							)");
 
 						const auto open_time = std::chrono::system_clock::now().time_since_epoch().count();
-						st->bind_value(open_time, 1);
-						st->bind_value(int(order->state()), 2);
-						st->bind_value(order_ids_row_id, 3);
+						st->bind_value(trade_ids_row_id, 1);
+						st->bind_value(open_time, 2);
+						st->bind_value(int(linked_trade->state()), 3);
+						st->bind_value(order_ids_row_id, 4);
 
 						st->step();
 					}
@@ -241,26 +242,28 @@ namespace tbp
 					// SB: insert into ORDERS
 					{
 						auto st = m_db->create_statement(LR"(
-							INSERT OR FAIL INTO ORDERS(CREATED, PROCESSED, STATE, LINKED_TRADE)
-							VALUES (?1, ?2, ?3, ?4)
+							INSERT OR FAIL INTO ORDERS(ID, CREATED, PROCESSED, STATE, LINKED_TRADE)
+							VALUES (?1, ?2, ?3, ?4, ?5)
 							)");
 
+						st->bind_value(order_ids_row_id, 1);
+
 						const auto creation_time = std::chrono::system_clock::now().time_since_epoch().count();
-						st->bind_value(creation_time, 1);
+						st->bind_value(creation_time, 2);
 
 						const auto state = order->state();
 						if (tbp::order::state_t::filled == state || tbp::order::state_t::canceled == state)
 						{
-							st->bind_value(creation_time, 2);
+							st->bind_value(creation_time, 3);
 						}
 						else
 						{
 							// SB: order is in pending state
-							st->bind_value(sqlite::vnull, 2);
+							st->bind_value(sqlite::vnull, 3);
 						}
 
-						st->bind_value(int(state), 3);
-						st->bind_value(nullptr != linked_trade ? sqlite::value_t(trade_ids_row_id) : sqlite::vnull, 4);
+						st->bind_value(int(state), 4);
+						st->bind_value(nullptr != linked_trade ? sqlite::value_t(trade_ids_row_id) : sqlite::vnull, 5);
 
 						st->step();
 					}
@@ -392,7 +395,7 @@ namespace tbp
 			}
 		}
 
-		void trader::cancel_all_pending_tasks()
+		void trader::close_pending_trades()
 		{
 			// SB: cancel all pending orders
 			auto pending_orders = m_db->get_pending_orders();
@@ -409,7 +412,21 @@ namespace tbp
 				m_db->set_order_state(order_id.internal_id, state);
 			}
 
-			// SB: need to think what to do with opened trades
+			// SB: close all pending trades
+			auto pending_trades = m_db->get_pending_trades();
+			for (const auto& trade_id : pending_trades)
+			{
+				auto trade = m_connector->find_trade(trade_id.remote_id);
+				if (nullptr != trade)
+				{
+					trade->close();
+					m_db->set_trade_state(trade->id(), trade->state());
+				}
+				else
+				{
+					LOG_WARN << L"Unable update trade state. Trade wasn't found by connector. Trade remote ID: " << trade_id.remote_id;
+				}
+			}
 		}
 
 		trader::trader(const tbp::connector::ptr& c, const std::wstring& working_dir)
@@ -422,9 +439,6 @@ namespace tbp
 			}
 
 			update_objects_states();
-
-			// SB: this should be done by strategy
-			//cancel_all_pending_tasks();
 		}
 
 		trader::~trader()
