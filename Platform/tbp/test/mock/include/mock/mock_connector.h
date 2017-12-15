@@ -134,6 +134,11 @@ public:
 		return { L"" };
 	}
 
+	virtual double available_balance() const override
+	{
+		return 0.0;
+	}
+
 	virtual tbp::data_t::ptr get_instant_data(const std::wstring& instrument_id) override
 	{
 		instant_data_request_log.emplace_back(instrument_id);

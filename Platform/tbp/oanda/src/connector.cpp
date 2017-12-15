@@ -157,6 +157,16 @@ namespace tbp
 					return uri_path.to_string();
 				}
 
+				std::wstring get_account_info(const std::wstring& account_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+
+					return uri_path.to_string();
+				}
+
 				std::wstring get_instant_prices_url(const std::wstring& account_id, const std::vector<std::wstring>& instruments) const
 				{
 					web::uri_builder uri_path(base_url);
@@ -312,6 +322,16 @@ namespace tbp
 					}
 
 					return result;
+				}
+
+				virtual double available_balance() const override
+				{
+					auto json_responce = execute_request(m_schema.get_account_info(m_account_id));
+
+					std::vector<std::wstring> result;
+					auto account_balance = json_responce.at(L"account").at(L"balance");
+
+					return to_double(account_balance.as_string());
 				}
 
 				virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) override

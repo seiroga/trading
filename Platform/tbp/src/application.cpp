@@ -32,10 +32,12 @@ namespace tbp
 		// SB: create trader
 		m_trader = m_factory->create_trader(m_connector);
 
+		auto balance = m_connector->available_balance();
+
 		// SB: create strategy
 		// ...........
 
-		m_data_collector->start();
+		//m_data_collector->start();
 
 		start_ui_thread();
 
