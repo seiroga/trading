@@ -137,6 +137,62 @@ namespace tbp
 				return wcstod(str.c_str(), nullptr);
 			}
 
+			web::json::value to_json(const tbp::data_t& data)
+			{
+				struct value_visitor : boost::static_visitor<web::json::value>
+				{
+					web::json::value result;
+
+					auto operator()(__int64 val)
+					{
+						return web::json::value(std::to_wstring(val));
+					}
+					
+					auto operator()(const std::wstring& val)
+					{
+						return web::json::value(val);
+					}
+
+					auto operator()(const time_t& val)
+					{
+						return web::json::value(to_str(val));
+					}
+					
+					auto operator()(bool val)
+					{
+						return web::json::value(val);
+					}
+					
+					auto operator()(double val)
+					{
+						return web::json::value(std::to_wstring(val));
+					}
+					
+					web::json::value operator()(const binary_t& val)
+					{
+						throw std::runtime_error("Unsupported json value!");
+					}
+					
+					auto operator()(const data_t& val)
+					{
+						for (const auto& it : val)
+						{
+							result[it.first] = it.second.apply_visitor(value_visitor());
+						}
+
+						return result;
+					}
+
+				public:
+					value_visitor()
+						: result(web::json::value::parse(L"{}"))
+					{
+					}
+				};
+
+				return value_visitor()(data);
+			}
+
 			/////////////////////////////////////////////////////////////////////////
 			// schema implemnetation
 
@@ -157,7 +213,7 @@ namespace tbp
 					return uri_path.to_string();
 				}
 
-				std::wstring get_account_info(const std::wstring& account_id) const
+				std::wstring get_account_info_url(const std::wstring& account_id) const
 				{
 					web::uri_builder uri_path(base_url);
 					uri_path.append_path(api_version);
@@ -194,10 +250,113 @@ namespace tbp
 					return uri_path.to_string();
 				}
 
+				std::wstring create_order_url(const std::wstring& account_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"orders");
+
+					return uri_path.to_string();
+				}
+
+				std::wstring cancel_order_url(const std::wstring& account_id, const std::wstring& order_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"orders");
+					uri_path.append_path(order_id);
+					uri_path.append_path(L"cancel");
+
+					return uri_path.to_string();
+				}
+
+				std::wstring get_transaction_info_url(const std::wstring& account_id, const std::wstring& transaction_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"transactions");
+					uri_path.append_path(transaction_id);
+
+					return uri_path.to_string();
+				}
+
 			public:
 				schema(const std::wstring& base_url, const std::wstring& api_version)
 					: base_url(base_url)
 					, api_version(api_version)
+				{
+				}
+			};
+
+			/////////////////////////////////////////////////////////////////////
+			// order_impl
+
+			class order_impl : public tbp::order
+			{
+			public:
+				using cancel_order_func_t = std::function<void ()>;
+
+			private:
+				const std::wstring m_id;
+				const std::wstring m_trade_id;
+				state_t m_state;
+				const cancel_order_func_t m_cancel_order_func;
+
+			public:
+				virtual std::wstring id() const override
+				{
+					return m_id;
+				}
+
+				virtual std::wstring trade_id() const override
+				{
+					return m_trade_id;
+				}
+
+				virtual state_t state() const override
+				{
+					return m_state;
+				}
+
+				virtual void cancel() override
+				{
+					switch (m_state)
+					{
+					case state_t::pending:
+						{
+							m_cancel_order_func();
+							m_state = state_t::canceled;
+
+							LOG_DBG << L"Order has been canceled. Order ID: " << m_id;
+						}
+						break;
+
+					case state_t::filled:
+						{
+							LOG_DBG << L"Unable to cancel order. Order has been already filled. Order ID: " << m_id;
+						}
+						break;
+
+					case state_t::canceled:
+						{
+							LOG_DBG << L"Order has been already closed. Order ID: " << m_id;
+						}
+						break;
+					}
+				}
+
+			public:
+				order_impl(const std::wstring& id, const std::wstring& trade_id, state_t s, const cancel_order_func_t& func)
+					: m_id(id)
+					, m_trade_id(trade_id)
+					, m_state(s)
+					, m_cancel_order_func(func)
 				{
 				}
 			};
@@ -209,27 +368,32 @@ namespace tbp
 			{
 				const std::wstring m_token;
 				const std::wstring m_account_id;
-				const schema m_schema;
+				const std::shared_ptr<schema> m_schema;
 
 			private:
-				web::http::http_request create_request(web::http::method m) const
+				static web::http::http_request create_request(web::http::method m, const std::wstring& token, const web::json::value& body)
 				{
 					web::http::http_request request(m);
 					auto& header = request.headers();
-					header[L"Authorization"] = L"Bearer " + m_token;
+					header[L"Authorization"] = L"Bearer " + token;
 					header[L"Content-Type"] = L"application/json";
 					header[L"Accept-Datetime-Format"] = L"RFC3339";
+
+					if (!body.is_null())
+					{
+						request.set_body(body);
+					}
 
 					return request;
 				}
 
-				web::json::value execute_request(const std::wstring& url) const
+				static web::json::value execute_request_impl(web::http::method method, const std::wstring& url, const std::wstring& token, const web::json::value& body = web::json::value())
 				{
 					try
 					{
 						// Create http_client to send the request.
 						web::http::client::http_client client(url);
-						auto request = create_request(web::http::methods::GET);
+						auto request = create_request(method, token, body);
 
 						web::json::value json_responce;
 						std::exception_ptr exception;
@@ -242,7 +406,6 @@ namespace tbp
 								exception = std::make_exception_ptr(http_exception(response.status_code(), response.reason_phrase()));
 							}
 
-							// Write response body into the file.
 							return response.extract_json();
 
 						}).then([&](const web::json::value& response)
@@ -264,6 +427,11 @@ namespace tbp
 					{
 						throw http_exception(ex.error_code().value(), ex.what());
 					}
+				}
+
+				web::json::value execute_request(web::http::method method, const std::wstring& url, const web::json::value& body = web::json::value()) const
+				{
+					return execute_request_impl(method, url, m_token, body);
 				}
 
 			private:
@@ -288,7 +456,7 @@ namespace tbp
 			public:
 				virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start, time_t* end) const override
 				{
-					auto json_responce = execute_request(m_schema.get_historical_prices_url(instrument_id, L"S5", *start, *end));
+					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_historical_prices_url(instrument_id, L"S5", *start, *end));
 
 					std::vector<data_t::ptr> result;
 					{
@@ -312,7 +480,7 @@ namespace tbp
 			public:
 				virtual std::vector<std::wstring> get_instruments() const override
 				{
-					auto json_responce = execute_request(m_schema.get_instruments_url(m_account_id));
+					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_instruments_url(m_account_id));
 
 					std::vector<std::wstring> result;
 					auto instruments = json_responce.at(L"instruments").as_array();
@@ -326,7 +494,7 @@ namespace tbp
 
 				virtual double available_balance() const override
 				{
-					auto json_responce = execute_request(m_schema.get_account_info(m_account_id));
+					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_account_info_url(m_account_id));
 
 					std::vector<std::wstring> result;
 					auto account_balance = json_responce.at(L"account").at(L"balance");
@@ -336,7 +504,7 @@ namespace tbp
 
 				virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) override
 				{
-					auto json_responce = execute_request(m_schema.get_instant_prices_url(m_account_id, { instrument_id }));
+					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_instant_prices_url(m_account_id, { instrument_id }));
 
 					tbp::data_t result;
 					auto prices = json_responce.at(L"prices").as_array();
@@ -364,7 +532,23 @@ namespace tbp
 
 				virtual order::ptr create_order(const data_t& params) override
 				{
-					return nullptr;
+					auto order_info = execute_request(web::http::methods::POST, m_schema->create_order_url(m_account_id), to_json(params));
+					auto create_transaction = order_info.at(L"orderCreateTransaction");
+					if (L"MARKET_ORDER" == create_transaction.at(L"type").as_string())
+					{
+						auto order_fill_transaction = order_info.at(L"orderFillTransaction");
+						const std::wstring trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
+						const auto order_id = order_fill_transaction.at(L"orderID").as_string();
+						const auto url = m_schema->cancel_order_url(m_account_id, order_id);
+						auto cancel_order_func = [token = m_token, url]()
+						{
+							execute_request_impl(web::http::methods::PUT, url, token);
+						};
+
+						return std::make_shared<order_impl>(order_id, trade_id, tbp::order::state_t::filled, cancel_order_func);
+					}
+
+					throw std::runtime_error("Unsupported order type!");
 				}
 
 				virtual order::ptr find_order(const std::wstring& id) const override
@@ -381,7 +565,7 @@ namespace tbp
 				connector_impl(const settings::ptr& settings, const authentication::ptr& auth)
 					: m_token(auth->get_token())
 					, m_account_id(get_value<std::wstring>(settings, L"account_id"))
-					, m_schema(get_value<std::wstring>(settings, L"url"), L"v3")
+					, m_schema(std::make_shared<schema>(get_value<std::wstring>(settings, L"url"), L"v3"))
 				{
 				}
 
@@ -403,7 +587,10 @@ namespace tbp
 			params[L"type"] = std::wstring(L"MARKET");
 			params[L"positionFill"] = std::wstring(L"DEFAULT");
 
-			return params;
+			data_t order_info;
+			order_info[L"order"] = std::move(params);
+
+			return order_info;
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////
