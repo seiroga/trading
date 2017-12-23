@@ -401,7 +401,7 @@ namespace tbp
 						// Handle response headers arriving.
 						auto requestTask = client.request(request).then([&](web::http::http_response response)
 						{
-							if (HTTP_STATUS_OK != response.status_code())
+							if (HTTP_STATUS_BAD_REQUEST <= response.status_code())
 							{
 								exception = std::make_exception_ptr(http_exception(response.status_code(), response.reason_phrase()));
 							}
@@ -410,6 +410,11 @@ namespace tbp
 
 						}).then([&](const web::json::value& response)
 						{
+							if (response.has_field(L"errorCode") && response.has_field(L"errorMessage"))
+							{
+								LOG_DBG << L"Request failed with next server info. " << L"Error code: " << response.at(L"errorCode").as_string() << L". Error message: " << response.at(L"errorMessage").as_string();
+							}
+
 							json_responce = response;
 						});
 
@@ -536,16 +541,26 @@ namespace tbp
 					auto create_transaction = order_info.at(L"orderCreateTransaction");
 					if (L"MARKET_ORDER" == create_transaction.at(L"type").as_string())
 					{
-						auto order_fill_transaction = order_info.at(L"orderFillTransaction");
-						const std::wstring trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
-						const auto order_id = order_fill_transaction.at(L"orderID").as_string();
-						const auto url = m_schema->cancel_order_url(m_account_id, order_id);
-						auto cancel_order_func = [token = m_token, url]()
+						if (order_info.has_field(L"orderFillTransaction"))
 						{
-							execute_request_impl(web::http::methods::PUT, url, token);
-						};
+							auto order_fill_transaction = order_info.at(L"orderFillTransaction");
+							const std::wstring trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
+							const auto order_id = order_fill_transaction.at(L"orderID").as_string();
+							const auto url = m_schema->cancel_order_url(m_account_id, order_id);
+							auto cancel_order_func = [token = m_token, url]()
+							{
+								execute_request_impl(web::http::methods::PUT, url, token);
+							};
 
-						return std::make_shared<order_impl>(order_id, trade_id, tbp::order::state_t::filled, cancel_order_func);
+							return std::make_shared<order_impl>(order_id, trade_id, tbp::order::state_t::filled, cancel_order_func);
+						}
+						else if (order_info.has_field(L"orderCancelTransaction"))
+						{
+							auto order_cancel_transaction = order_info.at(L"orderCancelTransaction");
+							const auto order_id = order_cancel_transaction.at(L"orderID").as_string();
+
+							return std::make_shared<order_impl>(order_id, L"", tbp::order::state_t::canceled, [](){});
+						}
 					}
 
 					throw std::runtime_error("Unsupported order type!");
@@ -582,7 +597,7 @@ namespace tbp
 		{
 			data_t params;
 			params[L"units"] = __int64(amount);
-			params[L"instument"] = instrument_id;
+			params[L"instrument"] = instrument_id;
 			params[L"timeInForce"] = std::wstring(L"FOK");
 			params[L"type"] = std::wstring(L"MARKET");
 			params[L"positionFill"] = std::wstring(L"DEFAULT");
