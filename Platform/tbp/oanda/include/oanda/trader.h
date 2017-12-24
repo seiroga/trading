@@ -21,7 +21,7 @@ namespace tbp
 			void update_objects_states();
 
 		public:
-			virtual void open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id) override;
+			virtual std::wstring open_trade(const std::wstring& instrument_id, long amount) override;
 			virtual void close_trade(const std::wstring& internal_id, long amount) override;
 			virtual void close_pending_trades() override;
 

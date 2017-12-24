@@ -2,6 +2,7 @@
 
 #include <win/exception.h>
 #include <win/fs.h>
+#include <win/com/utils.h>
 
 #include <vector>
 #include <algorithm>
@@ -19,31 +20,6 @@ namespace test_helpers
 {
 	namespace
 	{
-		std::wstring generate_guid()
-		{
-			GUID guid = { 0 };
-			if (S_OK != ::CoCreateGuid(&guid))
-			{
-				throw win::exception(L"CoCreateGuid call failed!");
-			}
-
-			auto co_task_mem_free = [](LPOLESTR ptr)
-			{
-				::CoTaskMemFree(ptr);
-			};
-
-			LPOLESTR guid_str = nullptr;
-			if (S_OK != ::StringFromCLSID(guid, &guid_str))
-			{
-				throw win::exception(L"StringFromCLSID call failed!");
-			}
-
-			std::unique_ptr<OLECHAR, decltype(co_task_mem_free)> guid_ptr(guid_str, co_task_mem_free);
-			std::wstring result(guid_str);
-
-			return result;
-		}
-
 		std::wstring get_module_directory()
 		{
 			wchar_t path_buff[1024] = { 0 };
@@ -100,7 +76,7 @@ namespace test_helpers
 
 	std::wstring base_fixture::unique_string()
 	{
-		return generate_guid();
+		return win::com::guid_to_str(win::com::generate_guid());
 	}
 
 	std::wstring base_fixture::get_file_path(const std::wstring& file_name)

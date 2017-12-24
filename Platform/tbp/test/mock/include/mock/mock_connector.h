@@ -127,6 +127,7 @@ public:
 	std::vector<std::shared_ptr<mock_order>> orders_log;
 	std::vector<std::shared_ptr<mock_trade>> trades_log;
 	bool fill_order_after_creation = false;
+	bool cancel_order_after_creation = false;
 
 public:
 	virtual std::vector<std::wstring> get_instruments() const override
@@ -161,6 +162,10 @@ public:
 		{
 			mo->fill_order();
 			create_trade(mo);
+		}
+		else if (cancel_order_after_creation)
+		{
+			mo->cancel();
 		}
 
 		return mo;

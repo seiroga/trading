@@ -5,6 +5,7 @@
 #include <sqlite/sqlite.h>
 
 #include <win/fs.h>
+#include <win/com/utils.h>
 
 #include <functional>
 
@@ -21,6 +22,11 @@ namespace tbp
 				using win::fs::operator/;
 
 				return working_dir / L"DB" / L"oanda" / L"trading.db";
+			}
+
+			std::wstring generate_id()
+			{
+				return win::com::guid_to_str(win::com::generate_guid());
 			}
 		}
 
@@ -293,25 +299,40 @@ namespace tbp
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// trader implementation
 
-		void trader::open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id)
+		std::wstring trader::open_trade(const std::wstring& instrument_id, long amount)
 		{
+			std::wstring internal_id;
+
 			// SB: create MarketOrder request
 			auto order = m_connector->create_order(create_market_order_params(instrument_id, amount));
 			switch (order->state())
 			{
 			case tbp::order::state_t::filled:
 				{
+					internal_id = generate_id();
 					auto trade = m_connector->find_trade(order->trade_id());
 					m_db->register_order(internal_id, order, trade);
 				}
 				break;
 
-			case tbp::order::state_t::canceled:
+			case tbp::order::state_t::pending:
 				{
+					internal_id = generate_id();
 					m_db->register_order(internal_id, order, nullptr);
 				}
 				break;
+
+			case tbp::order::state_t::canceled:
+				{
+					internal_id = generate_id();
+					m_db->register_order(internal_id, order, nullptr);
+
+					throw trade_canceled("Order was created successfully, but wasn't canceled by broker!");
+				}
+				break;
 			}
+
+			return internal_id;
 		}
 
 		void trader::close_trade(const std::wstring& internal_id, long amount)

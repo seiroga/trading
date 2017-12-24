@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="include\com">
+      <UniqueIdentifier>{4aa3ffb9-e82d-448f-aa4d-b90511d3f17d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\com">
+      <UniqueIdentifier>{daea9fec-1199-43a5-b0fb-b221e6a308fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fs.cpp">
@@ -16,6 +22,9 @@
     </ClCompile>
     <ClCompile Include="thread.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="com\utils.cpp">
+      <Filter>src\com</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +39,9 @@
     </ClInclude>
     <ClInclude Include="include\win\exception.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\win\com\utils.h">
+      <Filter>include\com</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

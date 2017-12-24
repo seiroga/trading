@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="com\utils.cpp" />
     <ClCompile Include="fs.cpp" />
     <ClCompile Include="thread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\win\com\utils.h" />
     <ClInclude Include="include\win\exception.h" />
     <ClInclude Include="include\win\fs.h" />
     <ClInclude Include="include\win\handle.h" />

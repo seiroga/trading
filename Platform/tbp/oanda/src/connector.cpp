@@ -544,15 +544,20 @@ namespace tbp
 						if (order_info.has_field(L"orderFillTransaction"))
 						{
 							auto order_fill_transaction = order_info.at(L"orderFillTransaction");
-							const std::wstring trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
 							const auto order_id = order_fill_transaction.at(L"orderID").as_string();
 							const auto url = m_schema->cancel_order_url(m_account_id, order_id);
+							std::wstring trade_id;
+							if (order_fill_transaction.has_field(L"tradeOpened"))
+							{
+								trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
+							}
+
 							auto cancel_order_func = [token = m_token, url]()
 							{
 								execute_request_impl(web::http::methods::PUT, url, token);
 							};
 
-							return std::make_shared<order_impl>(order_id, trade_id, tbp::order::state_t::filled, cancel_order_func);
+							return std::make_shared<order_impl>(order_id, trade_id, !trade_id.empty() ? tbp::order::state_t::filled : tbp::order::state_t::pending, cancel_order_func);
 						}
 						else if (order_info.has_field(L"orderCancelTransaction"))
 						{

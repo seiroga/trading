@@ -4,6 +4,7 @@
 
 #include <string>
 #include <memory>
+#include <exception>
 
 namespace tbp
 {
@@ -12,8 +13,13 @@ namespace tbp
 	public:
 		using ptr = std::shared_ptr<trader>;
 
+		struct trade_canceled : public std::runtime_error
+		{
+			using runtime_error::runtime_error;
+		};
+
 	public:
-		virtual void open_trade(const std::wstring& instrument_id, long amount, const std::wstring& internal_id) = 0;
+		virtual std::wstring open_trade(const std::wstring& instrument_id, long amount) = 0;
 		virtual void close_trade(const std::wstring& internal_id, long amount) = 0;
 		virtual void close_pending_trades() = 0;
 	};
