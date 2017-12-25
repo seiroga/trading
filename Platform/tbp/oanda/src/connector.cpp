@@ -587,10 +587,12 @@ namespace tbp
 					, m_account_id(get_value<std::wstring>(settings, L"account_id"))
 					, m_schema(std::make_shared<schema>(get_value<std::wstring>(settings, L"url"), L"v3"))
 				{
+					LOG_DBG << L"OANDA Connector has been created successfully!";
 				}
 
 				~connector_impl()
 				{
+					LOG_DBG << L"Connector has been destroyed!";
 				}
 			};
 		}

@@ -473,10 +473,13 @@ namespace tbp
 			}
 
 			update_objects_states();
+
+			LOG_DBG << L"Trader has been created successfully!";
 		}
 
 		trader::~trader()
 		{
+			LOG_DBG << L"Trader has been destroyed!";
 		}
 	}
 }
