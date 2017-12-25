@@ -66,7 +66,7 @@ namespace tbp
 		m_cache.clear();
 	}
 
-	std::vector<data_t::ptr> data_collector::get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const
+	std::vector<data_t::ptr> data_collector::get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const
 	{
 		if (nullptr == start_datetime || nullptr == end_datetime)
 		{
@@ -75,13 +75,13 @@ namespace tbp
 
 		auto actual_start = *start_datetime;
 		auto actual_end = *end_datetime;
-		auto result = m_data_storage->get_data(instrument_id, &actual_start, &actual_end);
+		auto result = m_data_storage->get_data(instrument_id, granularity, &actual_start, &actual_end);
 
 		if (actual_start != *start_datetime || actual_end != *end_datetime)
 		{
 			// SB: should we make connector call from worker thread? Is it some reason for this? Anyway we will wait untill data arrives...
-			result = m_connector->get_data(instrument_id, start_datetime, end_datetime);
-			m_data_storage->save_data(instrument_id, result);
+			result = m_connector->get_data(instrument_id, granularity, start_datetime, end_datetime);
+			m_data_storage->save_data(instrument_id, granularity, result);
 		}
 
 		return result;

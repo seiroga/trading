@@ -147,7 +147,7 @@ public:
 		return value;
 	}
 
-	virtual std::vector<tbp::data_t::ptr> get_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
+	virtual std::vector<tbp::data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
 	{
 		data_request_log.push_back({ instrument_id, *start_datetime, *end_datetime });
 

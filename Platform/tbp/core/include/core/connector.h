@@ -106,7 +106,7 @@ namespace tbp
 	public:
 		virtual std::vector<std::wstring> get_instruments() const = 0;
 		virtual double available_balance() const = 0;
-		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
+		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const = 0;
 		virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) = 0;
 		virtual order::ptr create_order(const data_t& params) = 0;
 		virtual order::ptr find_order(const std::wstring& id) const = 0;

@@ -74,7 +74,7 @@ namespace tbp
 				st = m_db->create_statement(L"CREATE TABLE [CANDLES]([ID] INTEGER PRIMARY KEY NOT NULL, [O_PRICE] DOUBLE, [H_PRICE] DOUBLE, [L_PRICE] DOUBLE, [C_PRICE] DOUBLE)");
 				st->step();
 
-				st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID_CANDLESTICK_ROW_ID] INTEGER, [ASK_CANDLESTICK_ROW_ID] INTEGER, [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
+				st = m_db->create_statement(L"CREATE TABLE [INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [GRANULARITY] INTEGER, [BID_CANDLESTICK] REFERENCES CANDLES(ID), [ASK_CANDLESTICK] REFERENCES CANDLES(ID), [VOLUME] INTEGER, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP], [GRANULARITY]))");
 				st->step();
 
 				st = m_db->create_statement(L"CREATE TABLE [INSTANT_INSTRUMENT_DATA]([INSTRUMENT_ID] REFERENCES INSTRUMENTS(ID) ON DELETE CASCADE, [TIMESTAMP] INTEGER, [BID] DOUBLE, [ASK] DOUBLE, PRIMARY KEY([INSTRUMENT_ID], [TIMESTAMP]))");
@@ -117,7 +117,7 @@ namespace tbp
 			return instrument_row_id;
 		}
 
-		std::vector<data_t::ptr> data_storage::get_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
+		std::vector<data_t::ptr> data_storage::get_data(const std::wstring& instrument_id, unsigned long granularity, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const
 		{
 			if (nullptr == start_datetime || nullptr == end_datetime)
 			{
@@ -125,13 +125,14 @@ namespace tbp
 			}
 
 			auto st = m_db->create_statement(LR"(
-				SELECT TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME 
+				SELECT TIMESTAMP, BID_CANDLESTICK, ASK_CANDLESTICK, VOLUME 
 					FROM INSTRUMENT_DATA 
-					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 ORDER BY TIMESTAMP ASC )");
+					WHERE INSTRUMENT_ID IN (SELECT ID FROM INSTRUMENTS WHERE INSTRUMENTS.NAME = ?1) AND INSTRUMENT_DATA.TIMESTAMP >= ?2 AND INSTRUMENT_DATA.TIMESTAMP <= ?3 AND INSTRUMENT_DATA.GRANULARITY = ?4 ORDER BY TIMESTAMP ASC )");
 
 			st->bind_value(instrument_id, 1);
 			st->bind_value(start_datetime->time_since_epoch().count(), 2);
 			st->bind_value(end_datetime->time_since_epoch().count(), 3);
+			st->bind_value(static_cast<int>(granularity), 4);
 
 			auto candels_data_st = m_db->create_statement(LR"(
 				SELECT O_PRICE, H_PRICE, L_PRICE, C_PRICE 
@@ -229,7 +230,7 @@ namespace tbp
 			return result;
 		}
 
-		void data_storage::save_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data)
+		void data_storage::save_data(const std::wstring& instrument_id, unsigned long granularity, const std::vector<data_t::ptr>& data)
 		{
 			sqlite::transaction t(m_db);
 
@@ -237,7 +238,7 @@ namespace tbp
 			{
 				const __int64 instrument_row_id = get_instrument_row_id(instrument_id);
 				auto insert_candle_data_st = m_db->create_statement(L"INSERT INTO CANDLES(O_PRICE, H_PRICE, L_PRICE, C_PRICE) VALUES (?1, ?2, ?3, ?4)");
-				auto insert_instrument_data_st = m_db->create_statement(L"INSERT OR REPLACE INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, BID_CANDLESTICK_ROW_ID, ASK_CANDLESTICK_ROW_ID, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5)");
+				auto insert_instrument_data_st = m_db->create_statement(L"INSERT OR REPLACE INTO INSTRUMENT_DATA(INSTRUMENT_ID, TIMESTAMP, GRANULARITY, BID_CANDLESTICK, ASK_CANDLESTICK, VOLUME) VALUES (?1, ?2, ?3, ?4, ?5, ?6)");
 				for (const auto& instrument_data : data)
 				{
 					insert_instrument_data_st->reset();
@@ -255,6 +256,9 @@ namespace tbp
 
 						insert_instrument_data_st->bind_value(boost::get<tbp::time_t>(it->second).time_since_epoch().count(), 2);
 					}
+
+					// GRANULARITY
+					insert_instrument_data_st->bind_value(static_cast<int>(granularity), 3);
 
 					std::wstring candlestick_values[] =
 					{
@@ -294,10 +298,10 @@ namespace tbp
 					};
 
 					// BID_CANDLESTICK
-					save_candlestick_data(values::instrument_data::c_bid_candlestick, 3);
+					save_candlestick_data(values::instrument_data::c_bid_candlestick, 4);
 
 					// ASK_CANDLESTICK
-					save_candlestick_data(values::instrument_data::c_ask_candlestick, 4);
+					save_candlestick_data(values::instrument_data::c_ask_candlestick, 5);
 
 					// VOLUME
 					{
@@ -307,7 +311,7 @@ namespace tbp
 							throw std::runtime_error("VOLUME value isn't provided by instrument data!");
 						}
 
-						insert_instrument_data_st->bind_value(boost::get<__int64>(it->second), 5);
+						insert_instrument_data_st->bind_value(boost::get<__int64>(it->second), 6);
 					}
 
 					insert_instrument_data_st->step();

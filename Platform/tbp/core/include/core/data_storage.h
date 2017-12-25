@@ -20,7 +20,7 @@ namespace tbp
 		boost::signals2::signal<void(const std::wstring& instrument_id, const std::vector<data_t::ptr>&)> on_instant_data;
 
 	public:
-		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
+		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const = 0;
 		virtual std::vector<data_t::ptr> get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const = 0;
 	};
 
@@ -30,7 +30,7 @@ namespace tbp
 		using ptr = std::shared_ptr<data_storage>;
 
 	public:
-		virtual void save_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) = 0;
+		virtual void save_data(const std::wstring& instrument_id, unsigned long granularity, const std::vector<data_t::ptr>& data) = 0;
 		virtual void save_instant_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) = 0;
 	};
 }

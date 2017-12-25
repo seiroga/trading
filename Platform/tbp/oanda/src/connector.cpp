@@ -193,6 +193,78 @@ namespace tbp
 				return value_visitor()(data);
 			}
 
+			// SB: grnularity expressed in secs
+			std::wstring granularity_to_str(unsigned long granularity)
+			{
+				switch (granularity)
+				{
+				case 5:
+					return L"S5";
+
+				case 10:
+					return L"S10";
+
+				case 15:
+					return L"S15";
+
+				case 30:
+					return L"S30";
+
+				case 60:
+					return L"M1";
+
+				case 120:
+					return L"M2";
+
+				case 240:
+					return L"M4";
+
+				case 300:
+					return L"M5";
+
+				case 600:
+					return L"M10";
+
+				case 900:
+					return L"M15";
+
+				case 1800:
+					return L"M30";
+
+				case 3600:
+					return L"H1";
+
+				case 7200:
+					return L"H2";
+
+				case 10800:
+					return L"H3";
+
+				case 14400:
+					return L"H4";
+
+				case 21600:
+					return L"H6";
+
+				case 28800:
+					return L"H8";
+
+				case 43200:
+					return L"H12";
+
+				case 86400:
+					return L"D";
+
+				case 604800:
+					return L"W";
+
+				case 2592000:
+					return L"M";
+				}
+
+				throw std::runtime_error("Invalid granularity specified!");
+			}
+
 			/////////////////////////////////////////////////////////////////////////
 			// schema implemnetation
 
@@ -459,9 +531,9 @@ namespace tbp
 				}
 
 			public:
-				virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start, time_t* end) const override
+				virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start, time_t* end) const override
 				{
-					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_historical_prices_url(instrument_id, L"S5", *start, *end));
+					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_historical_prices_url(instrument_id, granularity_to_str(granularity), *start, *end));
 
 					std::vector<data_t::ptr> result;
 					{

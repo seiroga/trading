@@ -20,7 +20,7 @@ namespace
 		tbp::time_t start;
 		tbp::time_t end;
 
-		virtual std::vector<tbp::data_t::ptr> get_data(const std::wstring& instrument_id, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
+		virtual std::vector<tbp::data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, tbp::time_t* start_datetime, tbp::time_t* end_datetime) const override
 		{
 			*start_datetime = start;
 			*end_datetime = end;
@@ -36,7 +36,7 @@ namespace
 			return instant_values;
 		}
 
-		virtual void save_data(const std::wstring& instrument_id, const std::vector<tbp::data_t::ptr>& data) override
+		virtual void save_data(const std::wstring& instrument_id, unsigned long granularity, const std::vector<tbp::data_t::ptr>& data) override
 		{
 			for (const auto& d : data)
 			{
@@ -140,7 +140,7 @@ BOOST_FIXTURE_TEST_CASE(data_collector_request_data_from_connector_if_not_presen
 	const auto requested_end = ds->end + delta;
 	auto actual_start = requested_start;
 	auto actual_end = requested_end;
-	dc->get_data(L"instrument_1", &actual_start, &actual_end);
+	dc->get_data(L"instrument_1", 5, &actual_start, &actual_end);
 
 	// ASSERT
 	BOOST_ASSERT(actual_start == requested_start);

@@ -43,9 +43,9 @@ namespace tbp
 			__int64 get_instrument_row_id(const std::wstring& instrument_id);
 
 		public:
-			virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
+			virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const override;
 			virtual std::vector<data_t::ptr> get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
-			virtual void save_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
+			virtual void save_data(const std::wstring& instrument_id, unsigned long granularity, const std::vector<data_t::ptr>& data) override;
 			virtual void save_instant_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data) override;
 
 		public:

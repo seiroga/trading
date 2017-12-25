@@ -15,6 +15,7 @@ namespace
 	struct common_fixture : test_helpers::temp_dir_fixture
 	{
 		std::random_device rand;
+		const unsigned long default_granularity = 5;
 
 		template<typename T>
 		T generate(long max_value = 1000)
@@ -134,8 +135,8 @@ BOOST_FIXTURE_TEST_CASE(save_data, common_fixture)
 	tbp::oanda::data_storage ds(db);
 
 	// ACT
-	ds.save_data(instrument_id, instrument_data);
-	auto data = ds.get_data(instrument_id, &start_time, &end_time);
+	ds.save_data(instrument_id, default_granularity, instrument_data);
+	auto data = ds.get_data(instrument_id, default_granularity, &start_time, &end_time);
 
 	// ASSERT
 	BOOST_ASSERT(start_time == get_timestamp(*data.begin()));
@@ -157,10 +158,10 @@ BOOST_FIXTURE_TEST_CASE(get_data, common_fixture)
 	tbp::oanda::data_storage ds(db);
 
 	// ACT
-	ds.save_data(instrument_id, instrument_data);
+	ds.save_data(instrument_id, default_granularity, instrument_data);
 	auto start_time2 = get_timestamp(instrument_data[10]);
 	auto end_time2 = get_timestamp(instrument_data[50]);
-	auto data = ds.get_data(instrument_id, &start_time2, &end_time2);
+	auto data = ds.get_data(instrument_id, default_granularity, &start_time2, &end_time2);
 
 	// ASSERT
 	BOOST_ASSERT(start_time2 == get_timestamp(instrument_data[10]));
@@ -182,8 +183,8 @@ BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
 	tbp::oanda::data_storage ds(db);
 
 	// ACT
-	ds.save_data(instrument_id, instrument_data);
-	auto data = ds.get_data(instrument_id, &start_time, &end_time);
+	ds.save_data(instrument_id, default_granularity, instrument_data);
+	auto data = ds.get_data(instrument_id, default_granularity, &start_time, &end_time);
 
 	// ASSERT
 	BOOST_ASSERT(is_equal(data, instrument_data));
@@ -195,8 +196,8 @@ BOOST_FIXTURE_TEST_CASE(update_data, common_fixture)
 	(*instrument_data[index])[tbp::oanda::values::instrument_data::c_bid_candlestick] = generate_candle(ask_price - generate_delta());
 
 	// ACT
-	ds.save_data(instrument_id, instrument_data);
-	data = ds.get_data(instrument_id, &start_time, &end_time);
+	ds.save_data(instrument_id, default_granularity, instrument_data);
+	data = ds.get_data(instrument_id, default_granularity, &start_time, &end_time);
 
 	// ASSERT
 	BOOST_ASSERT(is_equal(data, instrument_data));
@@ -216,10 +217,10 @@ BOOST_FIXTURE_TEST_CASE(get_data_requested_range_bigger_than_available, common_f
 	tbp::oanda::data_storage ds(db);
 
 	// ACT
-	ds.save_data(instrument_id, instrument_data);
+	ds.save_data(instrument_id, default_granularity, instrument_data);
 	auto available_start = start_time - tbp::time_t::duration(10000);
 	auto available_end = end_time + tbp::time_t::duration(10000);
-	auto data = ds.get_data(instrument_id, &available_start, &available_end);
+	auto data = ds.get_data(instrument_id, default_granularity, &available_start, &available_end);
 
 	// ASSERT
 	BOOST_ASSERT(available_start == get_timestamp(*instrument_data.begin()));
@@ -273,4 +274,43 @@ BOOST_FIXTURE_TEST_CASE(get_instant_data, common_fixture)
 	BOOST_ASSERT(start_time2 == get_timestamp(instrument_data[10]));
 	BOOST_ASSERT(end_time2 == get_timestamp(instrument_data[50]));
 	BOOST_ASSERT(is_equal(data, std::vector<tbp::data_t::ptr>(instrument_data.begin() + 10, instrument_data.begin() + 51)));
+}
+
+BOOST_FIXTURE_TEST_CASE(data_with_different_garnurality_independent, common_fixture)
+{
+	// INIT (generate data)
+	const auto instrument_id = L"instrument1";
+	temp_folder tmp_folder;
+	const auto db_name = unique_string();
+	const auto start_time = std::chrono::system_clock::now();
+	auto instrument_data = generate_data(100);
+	const auto end_time = std::chrono::system_clock::now();
+
+	const auto granularity2 = 10;
+	const auto start_time_g2 = std::chrono::system_clock::now();
+	auto instrument_data_g2 = generate_data(100);
+	const auto end_time_g2 = std::chrono::system_clock::now();
+
+	auto db = sqlite::connection::create(tmp_folder.path + L"\\" + db_name);
+	tbp::oanda::data_storage ds(db);
+
+	// ACT
+	ds.save_data(instrument_id, default_granularity, instrument_data);
+	auto start_time2 = get_timestamp(instrument_data[10]);
+	auto end_time2 = get_timestamp(instrument_data[50]);
+	auto data = ds.get_data(instrument_id, default_granularity, &start_time2, &end_time2);
+
+	ds.save_data(instrument_id, granularity2, instrument_data_g2);
+	auto start_time2_g2 = get_timestamp(instrument_data_g2[10]);
+	auto end_time2_g2 = get_timestamp(instrument_data_g2[50]);
+	auto data_g2 = ds.get_data(instrument_id, granularity2, &start_time2_g2, &end_time2_g2);
+
+	// ASSERT
+	BOOST_ASSERT(start_time2 == get_timestamp(instrument_data[10]));
+	BOOST_ASSERT(end_time2 == get_timestamp(instrument_data[50]));
+	BOOST_ASSERT(is_equal(data, std::vector<tbp::data_t::ptr>(instrument_data.begin() + 10, instrument_data.begin() + 51)));
+
+	BOOST_ASSERT(start_time2_g2 == get_timestamp(instrument_data_g2[10]));
+	BOOST_ASSERT(end_time2_g2 == get_timestamp(instrument_data_g2[50]));
+	BOOST_ASSERT(is_equal(data_g2, std::vector<tbp::data_t::ptr>(instrument_data_g2.begin() + 10, instrument_data_g2.begin() + 51)));
 }

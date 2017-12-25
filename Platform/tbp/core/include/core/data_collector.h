@@ -33,7 +33,7 @@ namespace tbp
 
 	public:
 		// SB: if data not present id data storage gets it from connector and updates data in storage 
-		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
+		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const override;
 		virtual std::vector<data_t::ptr> get_instant_data(const std::wstring& instrument_id, time_t* start_datetime, time_t* end_datetime) const override;
 
 	public:
