@@ -18,6 +18,7 @@ namespace tbp
 
 	public:
 		boost::signals2::signal<void(const std::wstring& instrument_id, const std::vector<data_t::ptr>&)> on_instant_data;
+		boost::signals2::signal<void(const std::wstring& instrument_id, const std::vector<data_t::ptr>&)> on_historical_data;
 
 	public:
 		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const = 0;

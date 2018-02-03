@@ -1,3 +1,4 @@
 {
-    "DataCollectorCacheSize": 100
+    "DataCollectorCacheSize": 100,
+    "DataGranulatiry": 1
 }

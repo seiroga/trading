@@ -2,11 +2,64 @@
 
 #include <logging/log.h>
 
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <future>
+#include <sstream>
 
 namespace tbp
 {
-	void data_collector::collect_data_thread()
+	namespace
+	{
+		// SB: this code is taken from oanda connector implementation for testing purposes
+		std::wstring to_str(time_t time)
+		{
+			const auto epoch_time_t = std::chrono::system_clock::to_time_t(time_t());
+			auto epoch_time = gmtime(&epoch_time_t);
+			auto raw_time = time.time_since_epoch().count();
+			SYSTEMTIME st = { 0 };
+			if (0 == ::FileTimeToSystemTime(reinterpret_cast<const FILETIME*>(&raw_time), &st))
+			{
+				throw win::exception(L"FileTimeToSystemTime call failed!");
+			}
+
+			// according to https://tools.ietf.org/rfc/rfc3339.txt
+			return std::to_wstring(st.wYear - 1601 + epoch_time->tm_year + 1900) + L"-" + std::to_wstring(st.wMonth) + L"-" + std::to_wstring(st.wDay) + L"T" + std::to_wstring(st.wHour) + L":" +
+				std::to_wstring(st.wMinute) + L":" + std::to_wstring(st.wSecond) + (0 != st.wMilliseconds ? L"." + std::to_wstring(st.wMilliseconds) : L".000000000") + L"Z";
+		}
+
+		auto align_to_granularity(const tbp::time_t& time , std::chrono::seconds granularity)
+		{
+			return (time.time_since_epoch() / granularity) * granularity;
+		}
+
+		unsigned long get_millisecs_delay_till_next_request(std::chrono::seconds granularity)
+		{
+			auto curr_time = tbp::time_t::clock::now();
+			auto aligned_next_time = align_to_granularity(curr_time, granularity) + granularity;
+			auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(aligned_next_time - curr_time.time_since_epoch());
+			
+			// SB: this additional delay needed to compensate inaccuracy of system timer and 
+			// inaccuracy during arithmetic operations of time values with different precision (nanoseconds / milliseconds / seconds)
+			// Example of this situation provided below:
+			// [2018-02-04 16:42:17.001106][0x000053c0][info]    Curr time: 14:42:16.999Z. Aligned next time: 14:42:17.000000000Z. Diff ms : 0
+			// [2018-02-04 16:42:17.001106][0x000053c0][info]    Curr time: 14:42:17.1Z. Aligned next time: 14:42:18.000000000Z. Diff ms : 998
+			// [2018-02-04 16:42:18.000273][0x000053c0][info]    Curr time: 14:42:17.999Z. Aligned next time: 14:42:18.000000000Z. Diff ms : 0
+			// [2018-02-04 16:42:18.001273][0x000053c0][info]    Curr time: 14:42:18.1Z. Aligned next time: 14:42:19.000000000Z. Diff ms : 998
+			// [2018-02-04 16:42:19.000595][0x000053c0][info]    Curr time: 14:42:18.999Z. Aligned next time: 14:42:19.000000000Z. Diff ms : 0
+			// [2018-02-04 16:42:19.001592][0x000053c0][info]    Curr time: 14:42:19.1Z. Aligned next time: 14:42:20.000000000Z. Diff ms : 998
+			// [2018-02-04 16:42:19.999606][0x000053c0][info]    Curr time: 14:42:19.999Z. Aligned next time: 14:42:20.000000000Z. Diff ms : 0
+			// [2018-02-04 16:42:20.000548][0x000053c0][info]    Curr time: 14:42:20.000000000Z. Aligned next time: 14:42:21.000000000Z. Diff ms : 999
+			
+			diff += std::chrono::milliseconds(100);
+
+			//LOG_INFO << L"Curr time: " << to_str(curr_time) << L". Aligned next time: " << to_str(tbp::time_t(std::chrono::duration_cast<tbp::time_t::duration>(aligned_next_time))) << L". Diff ms: " << diff.count();
+
+			return boost::numeric_cast<unsigned long>(diff.count());
+		}
+	}
+
+	void data_collector::collect_instant_data_thread()
 	{
 		auto res = win::wait_for_multiple_objects(false, INFINITE, m_start_evt, m_stop_evt);
 		if (1 == res.second)
@@ -51,6 +104,47 @@ namespace tbp
 
 		// SB: flush all newly collected data
 		flush_cache();
+	}
+
+	void data_collector::collect_historical_data_thread()
+	{
+		auto res = win::wait_for_multiple_objects(false, INFINITE, m_start_evt, m_stop_evt);
+		if (1 == res.second)
+		{
+			// SB: stop request
+			return;
+		}
+
+		// SB: lets synchronize our request with data granularity
+		const std::chrono::seconds granularity_secs(m_historcial_data_granularity);
+		unsigned long wait_interval = get_millisecs_delay_till_next_request(granularity_secs);
+		while (!m_stop_evt.wait(wait_interval))
+		{
+			try
+			{
+				auto curr_time = tbp::time_t::clock::now();
+				curr_time = tbp::time_t(std::chrono::duration_cast<tbp::time_t::duration>(align_to_granularity(curr_time, granularity_secs)));
+				auto start_time = curr_time - granularity_secs;
+				auto data = m_connector->get_data(m_instrument_id, m_historcial_data_granularity, &start_time, &curr_time);
+				m_data_storage->save_data(m_instrument_id, m_historcial_data_granularity, data);
+
+				on_historical_data(m_instrument_id, data);
+			}
+			catch (const tbp::http_exception& ex)
+			{
+				LOG_ERR << L"Exception was thrown during HTTP request. Code: " << ex.code << L" Info: " << ex.what();
+			}
+			catch (const std::exception& ex)
+			{
+				LOG_ERR << L"Exception was thrown during retrieving data from server." << L" Info: " << ex.what();
+			}
+			catch (...)
+			{
+				LOG_ERR << L"Unknown error! Exception was thrown during retrieving data from server!";
+			}
+
+			wait_interval = get_millisecs_delay_till_next_request(granularity_secs);
+		}
 	}
 
 	void data_collector::flush_cache()
@@ -112,19 +206,22 @@ namespace tbp
 
 	data_collector::data_collector(const std::wstring& instrument_id, const settings::ptr& s, const tbp::connector::ptr& connector, const data_storage::ptr& ds)
 		: m_cache_size(get_value<int>(s, L"DataCollectorCacheSize", 100))
+		, m_historcial_data_granularity(get_value<int>(s, L"DataGranulatiry", 60))
 		, m_start_evt(true, false)
 		, m_stop_evt(true, false)
 		, m_instrument_id(instrument_id)
 		, m_data_storage(ds)
 		, m_connector(connector)
-		, m_worker(std::bind(&data_collector::collect_data_thread, this))
+		, m_instant_worker(std::bind(&data_collector::collect_instant_data_thread, this))
+		, m_historical_worker(std::bind(&data_collector::collect_historical_data_thread, this))
 	{
 	}
 
 	data_collector::~data_collector()
 	{
 		m_stop_evt.set();
-		m_worker.join();
+		m_instant_worker.join();
+		m_historical_worker.join();
 
 		LOG_DBG << L"Data collector has been shutdown!";
 	}

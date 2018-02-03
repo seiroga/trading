@@ -18,6 +18,7 @@ namespace tbp
 
 	private:
 		const size_t m_cache_size;
+		const unsigned long m_historcial_data_granularity;
 		win::event m_start_evt;
 		win::event m_stop_evt;
 		win::critical_section m_cache_cs;
@@ -25,10 +26,12 @@ namespace tbp
 		const std::wstring m_instrument_id;
 		const data_storage::ptr m_data_storage;
 		const tbp::connector::ptr m_connector;
-		std::thread m_worker;
+		std::thread m_instant_worker;
+		std::thread m_historical_worker;
 
 	private:
-		void collect_data_thread();
+		void collect_instant_data_thread();
+		void collect_historical_data_thread();
 		void flush_cache();
 
 	public:
