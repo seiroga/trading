@@ -17,6 +17,9 @@
     <ClCompile Include="src\settings.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\analysis.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\connector.h">
@@ -41,6 +44,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\core\trader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\analysis.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

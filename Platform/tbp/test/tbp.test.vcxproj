@@ -171,6 +171,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="oanda\test_data_storage.cpp" />
     <ClCompile Include="oanda\test_trader.cpp" />
+    <ClCompile Include="test_analysis.cpp" />
     <ClCompile Include="test_data_collector.cpp" />
   </ItemGroup>
   <ItemGroup>

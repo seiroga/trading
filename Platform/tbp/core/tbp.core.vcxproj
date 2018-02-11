@@ -138,10 +138,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\analysis.cpp" />
     <ClCompile Include="src\data_collector.cpp" />
     <ClCompile Include="src\settings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\core\analysis.h" />
     <ClInclude Include="include\core\connector.h" />
     <ClInclude Include="include\core\data_collector.h" />
     <ClInclude Include="include\core\data_storage.h" />
