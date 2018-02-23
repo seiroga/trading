@@ -20,6 +20,9 @@
     <ClCompile Include="src\analysis.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\strategy.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\connector.h">
@@ -47,6 +50,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\core\analysis.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\core\utilities.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

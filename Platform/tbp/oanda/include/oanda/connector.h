@@ -23,7 +23,7 @@ namespace tbp
 			~authentication();
 		};
 
-		data_t create_market_order_params(const std::wstring& instrument_id, long amount);
+		data_t create_market_order_params(const std::wstring& instrument_id, double amount);
 
 		/////////////////////////////////////////////////////////////////////////
 		// connector

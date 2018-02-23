@@ -24,7 +24,7 @@ namespace tbp
 			const double alpha = 2.0 / (ema_length + 1);
 			if (ema->size() < ema_length)
 			{
-				// SB: clear EMA values in case if we need to calculate SMA
+				// SB: clear EMA values in case if we need to calculate SMA first
 				ema->clear();
 			}
 
@@ -47,7 +47,7 @@ namespace tbp
 					}
 					else
 					{
-						auto ema_val = val * alpha + (1 - alpha) * ema->back();
+						auto ema_val = val * alpha + (1.0 - alpha) * ema->back();
 						ema->push_back(static_cast<ema_value_t>(ema_val));
 					}
 
@@ -58,7 +58,7 @@ namespace tbp
 			{
 				for (size_t i = ema->size(); i < values.size(); ++i)
 				{
-					auto ema_val = values[i] * alpha + (1 - alpha) * ema->back();
+					auto ema_val = values[i] * alpha + (1.0 - alpha) * ema->back();
 					ema->push_back(static_cast<ema_value_t>(ema_val));
 				}
 			}

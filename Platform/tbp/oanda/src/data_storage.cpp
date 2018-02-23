@@ -13,6 +13,7 @@ namespace tbp
 				const std::wstring c_volume(L"VOLUME");
 				const std::wstring c_bid_candlestick(L"BID_CANDLESTICK");
 				const std::wstring c_ask_candlestick(L"ASK_CANDLESTICK");
+				const std::wstring c_complete(L"COMPLETE");
 			}
 
 			namespace instant_data

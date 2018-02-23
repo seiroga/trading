@@ -77,7 +77,7 @@ namespace tbp
 
 				// according to https://tools.ietf.org/rfc/rfc3339.txt
 				return std::to_wstring(st.wYear - 1601 + epoch_time->tm_year + 1900) + L"-" + std::to_wstring(st.wMonth) + L"-" + std::to_wstring(st.wDay) + L"T" + std::to_wstring(st.wHour) + L":" + 
-					std::to_wstring(st.wMinute) + L":" + std::to_wstring(st.wSecond) + (0 != st.wMilliseconds ? L"." + std::to_wstring(st.wMilliseconds) : L"") + L"Z";
+					std::to_wstring(st.wMinute) + L":" + std::to_wstring(st.wSecond) + (0 != st.wMilliseconds ? L"." + std::to_wstring(st.wMilliseconds) : L".000000000") + L"Z";
 			}
 
 			tbp::time_t to_time(const std::wstring& str)
@@ -268,7 +268,7 @@ namespace tbp
 			/////////////////////////////////////////////////////////////////////////
 			// schema implemnetation
 
-			struct schema
+			struct service_schema
 			{
 				const std::wstring base_url;
 				const std::wstring api_version;
@@ -322,6 +322,20 @@ namespace tbp
 					return uri_path.to_string();
 				}
 
+				std::wstring get_historical_prices_url(const std::wstring& instrument, const std::wstring& granularity, time_t utc_start) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"instruments");
+					uri_path.append_path(instrument);
+					uri_path.append_path(L"candles");
+					uri_path.append_query(L"price", L"BA");
+					uri_path.append_query(L"granularity", granularity);
+					uri_path.append_query(L"from", to_str(utc_start));
+
+					return uri_path.to_string();
+				}
+
 				std::wstring create_order_url(const std::wstring& account_id) const
 				{
 					web::uri_builder uri_path(base_url);
@@ -329,6 +343,18 @@ namespace tbp
 					uri_path.append_path(L"accounts");
 					uri_path.append_path(account_id);
 					uri_path.append_path(L"orders");
+
+					return uri_path.to_string();
+				}
+
+				std::wstring get_order_info_url(const std::wstring& account_id, const std::wstring& order_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"orders");
+					uri_path.append_path(order_id);
 
 					return uri_path.to_string();
 				}
@@ -358,8 +384,33 @@ namespace tbp
 					return uri_path.to_string();
 				}
 
+				std::wstring get_trade_info_url(const std::wstring& account_id, const std::wstring& trade_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"trades");
+					uri_path.append_path(trade_id);
+
+					return uri_path.to_string();
+				}
+
+				std::wstring close_trade_url(const std::wstring& account_id, const std::wstring& trade_id) const
+				{
+					web::uri_builder uri_path(base_url);
+					uri_path.append_path(api_version);
+					uri_path.append_path(L"accounts");
+					uri_path.append_path(account_id);
+					uri_path.append_path(L"trades");
+					uri_path.append_path(trade_id);
+					uri_path.append_path(L"close");
+
+					return uri_path.to_string();
+				}
+
 			public:
-				schema(const std::wstring& base_url, const std::wstring& api_version)
+				service_schema(const std::wstring& base_url, const std::wstring& api_version)
 					: base_url(base_url)
 					, api_version(api_version)
 				{
@@ -367,83 +418,19 @@ namespace tbp
 			};
 
 			/////////////////////////////////////////////////////////////////////
-			// order_impl
+			// service_client
 
-			class order_impl : public tbp::order
+			struct service_client : public sb::dynamic
 			{
-			public:
-				using cancel_order_func_t = std::function<void ()>;
-
-			private:
-				const std::wstring m_id;
-				const std::wstring m_trade_id;
-				state_t m_state;
-				const cancel_order_func_t m_cancel_order_func;
+				using ptr = std::shared_ptr<service_client>;
 
 			public:
-				virtual std::wstring id() const override
-				{
-					return m_id;
-				}
-
-				virtual std::wstring trade_id() const override
-				{
-					return m_trade_id;
-				}
-
-				virtual state_t state() const override
-				{
-					return m_state;
-				}
-
-				virtual void cancel() override
-				{
-					switch (m_state)
-					{
-					case state_t::pending:
-						{
-							m_cancel_order_func();
-							m_state = state_t::canceled;
-
-							LOG_DBG << L"Order has been canceled. Order ID: " << m_id;
-						}
-						break;
-
-					case state_t::filled:
-						{
-							LOG_DBG << L"Unable to cancel order. Order has been already filled. Order ID: " << m_id;
-						}
-						break;
-
-					case state_t::canceled:
-						{
-							LOG_DBG << L"Order has been already closed. Order ID: " << m_id;
-						}
-						break;
-					}
-				}
+				const std::wstring token;
+				const std::wstring account_id;
+				const std::shared_ptr<service_schema> schema;
 
 			public:
-				order_impl(const std::wstring& id, const std::wstring& trade_id, state_t s, const cancel_order_func_t& func)
-					: m_id(id)
-					, m_trade_id(trade_id)
-					, m_state(s)
-					, m_cancel_order_func(func)
-				{
-				}
-			};
-
-			/////////////////////////////////////////////////////////////////////////
-			// connector_impl implemnetation
-
-			class connector_impl : public tbp::connector
-			{
-				const std::wstring m_token;
-				const std::wstring m_account_id;
-				const std::shared_ptr<schema> m_schema;
-
-			private:
-				static web::http::http_request create_request(web::http::method m, const std::wstring& token, const web::json::value& body)
+				web::http::http_request create_request(web::http::method m, const web::json::value& body)
 				{
 					web::http::http_request request(m);
 					auto& header = request.headers();
@@ -459,15 +446,15 @@ namespace tbp
 					return request;
 				}
 
-				static web::json::value execute_request_impl(web::http::method method, const std::wstring& url, const std::wstring& token, const web::json::value& body = web::json::value())
+				web::json::value execute_request(web::http::method method, const std::wstring& url, const web::json::value& body = web::json::value())
 				{
 					try
 					{
 						// Create http_client to send the request.
 						web::http::client::http_client client(url);
-						auto request = create_request(method, token, body);
+						auto request = create_request(method, body);
 
-						web::json::value json_responce;
+						web::json::value json_response;
 						std::exception_ptr exception;
 
 						// Handle response headers arriving.
@@ -482,12 +469,7 @@ namespace tbp
 
 						}).then([&](const web::json::value& response)
 						{
-							if (response.has_field(L"errorCode") && response.has_field(L"errorMessage"))
-							{
-								LOG_DBG << L"Request failed with next server info. " << L"Error code: " << response.at(L"errorCode").as_string() << L". Error message: " << response.at(L"errorMessage").as_string();
-							}
-
-							json_responce = response;
+							json_response = response;
 						});
 
 						// Wait for all the outstanding I/O to complete
@@ -495,10 +477,15 @@ namespace tbp
 
 						if (nullptr != exception)
 						{
+							const auto error_code = json_response.has_field(L"errorCode") ? json_response.at(L"errorCode").as_string() : L"Not specified";
+							const auto error_message = json_response.has_field(L"errorMessage") ? json_response.at(L"errorMessage").as_string() : L"Not specified";
+
+							LOG_DBG << L"Request failed with next server info. " << L"Error code: " << error_code << L". Error message: " << error_message;
+
 							std::rethrow_exception(exception);
 						}
 
-						return json_responce;
+						return json_response;
 					}
 					catch (const web::http::http_exception& ex)
 					{
@@ -506,9 +493,176 @@ namespace tbp
 					}
 				}
 
+			public:
+				service_client(const std::wstring& token, const std::wstring& account_id, const std::shared_ptr<service_schema>& schema)
+					: token(token)
+					, account_id(account_id)
+					, schema(schema)
+				{
+				}
+			};
+
+			/////////////////////////////////////////////////////////////////////
+			// order_impl
+
+			class order_impl : public tbp::order
+			{
+				service_client::ptr m_service;
+				const std::wstring m_id;
+				const std::wstring m_trade_id;
+
+			public:
+				virtual std::wstring id() const override
+				{
+					return m_id;
+				}
+
+				virtual std::wstring trade_id() const override
+				{
+					return m_trade_id;
+				}
+
+				virtual state_t state() const override
+				{
+					auto url = m_service->schema->get_order_info_url(m_service->account_id, m_id);
+					auto response = m_service->execute_request(web::http::methods::GET, url);
+					const auto order_state = response.at(L"order").at(L"state").as_string();
+					if (L"PENDING" == order_state)
+					{
+						return state_t::pending;
+					}
+					else if(L"FILLED" == order_state)
+					{
+						return state_t::filled;
+					}
+					else if (L"CANCELLED" == order_state)
+					{
+						return state_t::canceled;
+					}
+
+					// SB: strange state...
+					throw std::runtime_error(sb::to_str(L"Unsupported order state! State: " + order_state));
+				}
+
+				virtual void cancel() override
+				{
+					switch (state())
+					{
+					case state_t::pending:
+						{
+							const auto url = m_service->schema->cancel_order_url(m_service->account_id, m_id);
+							m_service->execute_request(web::http::methods::PUT, url);
+
+							LOG_DBG << L"Order has been canceled. Order ID: " << m_id;
+						}
+						break;
+
+					case state_t::filled:
+						{
+							LOG_DBG << L"Unable to cancel order. Order has been already filled. Order ID: " << m_id;
+						}
+						break;
+
+					case state_t::canceled:
+						{
+							LOG_DBG << L"Order has been already canceled. Order ID: " << m_id;
+						}
+						break;
+					}
+				}
+
+			public:
+				order_impl(const std::wstring& id, const std::wstring& trade_id, const service_client::ptr& service)
+					: m_service(service)
+					, m_id(id)
+					, m_trade_id(trade_id)
+				{
+				}
+			};
+
+			/////////////////////////////////////////////////////////////////////////
+			// trade_impl
+
+			class trade_impl : public tbp::trade
+			{
+				service_client::ptr m_service;
+				const std::wstring m_id;
+
+			private:
+				auto get_trade_info() const
+				{
+					const auto url = m_service->schema->get_trade_info_url(m_service->account_id, m_id);
+					auto response = m_service->execute_request(web::http::methods::GET, url);
+					return response.at(L"trade");
+				}
+
+			public:
+				virtual std::wstring id() const override
+				{
+					return m_id;
+				}
+
+				virtual state_t state() const override
+				{
+					auto trade_info = get_trade_info();
+					const auto& state_val = trade_info.at(L"state").as_string();
+					if (L"OPEN" == state_val)
+					{
+						return state_t::opened;
+					}
+					else if (L"CLOSED" == state_val)
+					{
+						return state_t::closed;
+					}
+					else if (L"CLOSE_WHEN_TRADEABLE" == state_val)
+					{
+						// SB: returns "opened" since it hasn't been closed yet
+						return state_t::opened;
+					}
+
+					throw std::runtime_error("Unsupported trade state was returned!");
+				}
+
+				virtual double amount() const override
+				{
+					auto trade_info = get_trade_info();
+
+					return to_double(trade_info.at(L"currentUnits").as_string());
+				}
+
+				virtual double profit(bool unrealized) const override
+				{
+					auto trade_info = get_trade_info();
+
+					return to_double(trade_info.at(unrealized ? L"unrealizedPL" : L"realizedPL").as_string());
+				}
+
+				virtual void close(double amount_to_close) override
+				{
+					// SB: for now ignore amount_to_close, always close trade fully
+					const auto url = m_service->schema->close_trade_url(m_service->account_id, m_id);
+					m_service->execute_request(web::http::methods::PUT, url);
+				}
+
+			public:
+				trade_impl(const std::wstring& id, const service_client::ptr& service)
+					: m_id(id)
+					, m_service(service)
+				{
+				}
+			};
+
+			/////////////////////////////////////////////////////////////////////////
+			// connector_impl implemnetation
+
+			class connector_impl : public tbp::connector
+			{
+				const service_client::ptr m_service;
+
+			private:
 				web::json::value execute_request(web::http::method method, const std::wstring& url, const web::json::value& body = web::json::value()) const
 				{
-					return execute_request_impl(method, url, m_token, body);
+					return m_service->execute_request(method, url, body);
 				}
 
 			private:
@@ -533,7 +687,9 @@ namespace tbp
 			public:
 				virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start, time_t* end) const override
 				{
-					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_historical_prices_url(instrument_id, granularity_to_str(granularity), *start, *end));
+					auto url = nullptr != end ? m_service->schema->get_historical_prices_url(instrument_id, granularity_to_str(granularity), *start, *end) :
+						m_service->schema->get_historical_prices_url(instrument_id, granularity_to_str(granularity), *start);
+					auto json_responce = execute_request(web::http::methods::GET, url);
 
 					std::vector<data_t::ptr> result;
 					{
@@ -546,6 +702,7 @@ namespace tbp
 							candle_info.insert({ values::instrument_data::c_volume, static_cast<__int64>(candle_obj.at(L"volume").as_integer()) });
 							candle_info.insert({ values::instrument_data::c_bid_candlestick, parse_candle_object(candle_obj.at(L"bid").as_object()) });
 							candle_info.insert({ values::instrument_data::c_ask_candlestick, parse_candle_object(candle_obj.at(L"ask").as_object()) });
+							candle_info.insert({ values::instrument_data::c_complete, candle_obj.at(L"complete").as_bool() });
 
 							result.emplace_back(std::make_shared<tbp::data_t>(std::move(candle_info)));
 						}
@@ -557,7 +714,7 @@ namespace tbp
 			public:
 				virtual std::vector<std::wstring> get_instruments() const override
 				{
-					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_instruments_url(m_account_id));
+					auto json_responce = execute_request(web::http::methods::GET, m_service->schema->get_instruments_url(m_service->account_id));
 
 					std::vector<std::wstring> result;
 					auto instruments = json_responce.at(L"instruments").as_array();
@@ -571,7 +728,7 @@ namespace tbp
 
 				virtual double available_balance() const override
 				{
-					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_account_info_url(m_account_id));
+					auto json_responce = execute_request(web::http::methods::GET, m_service->schema->get_account_info_url(m_service->account_id));
 
 					std::vector<std::wstring> result;
 					auto account_balance = json_responce.at(L"account").at(L"balance");
@@ -579,9 +736,19 @@ namespace tbp
 					return to_double(account_balance.as_string());
 				}
 
+				virtual double margin_rate() const override
+				{
+					auto json_responce = execute_request(web::http::methods::GET, m_service->schema->get_account_info_url(m_service->account_id));
+
+					std::vector<std::wstring> result;
+					auto account_balance = json_responce.at(L"account").at(L"marginRate");
+
+					return to_double(account_balance.as_string());
+				}
+
 				virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) override
 				{
-					auto json_responce = execute_request(web::http::methods::GET, m_schema->get_instant_prices_url(m_account_id, { instrument_id }));
+					auto json_responce = execute_request(web::http::methods::GET, m_service->schema->get_instant_prices_url(m_service->account_id, { instrument_id }));
 
 					tbp::data_t result;
 					auto prices = json_responce.at(L"prices").as_array();
@@ -609,7 +776,7 @@ namespace tbp
 
 				virtual order::ptr create_order(const data_t& params) override
 				{
-					auto order_info = execute_request(web::http::methods::POST, m_schema->create_order_url(m_account_id), to_json(params));
+					auto order_info = execute_request(web::http::methods::POST, m_service->schema->create_order_url(m_service->account_id), to_json(params));
 					auto create_transaction = order_info.at(L"orderCreateTransaction");
 					if (L"MARKET_ORDER" == create_transaction.at(L"type").as_string())
 					{
@@ -617,26 +784,20 @@ namespace tbp
 						{
 							auto order_fill_transaction = order_info.at(L"orderFillTransaction");
 							const auto order_id = order_fill_transaction.at(L"orderID").as_string();
-							const auto url = m_schema->cancel_order_url(m_account_id, order_id);
 							std::wstring trade_id;
 							if (order_fill_transaction.has_field(L"tradeOpened"))
 							{
 								trade_id = order_fill_transaction.at(L"tradeOpened").at(L"tradeID").as_string();
 							}
 
-							auto cancel_order_func = [token = m_token, url]()
-							{
-								execute_request_impl(web::http::methods::PUT, url, token);
-							};
-
-							return std::make_shared<order_impl>(order_id, trade_id, !trade_id.empty() ? tbp::order::state_t::filled : tbp::order::state_t::pending, cancel_order_func);
+							return std::make_shared<order_impl>(order_id, trade_id, m_service);
 						}
 						else if (order_info.has_field(L"orderCancelTransaction"))
 						{
 							auto order_cancel_transaction = order_info.at(L"orderCancelTransaction");
 							const auto order_id = order_cancel_transaction.at(L"orderID").as_string();
 
-							return std::make_shared<order_impl>(order_id, L"", tbp::order::state_t::canceled, [](){});
+							return std::make_shared<order_impl>(order_id, L"", m_service);
 						}
 					}
 
@@ -645,19 +806,36 @@ namespace tbp
 
 				virtual order::ptr find_order(const std::wstring& id) const override
 				{
-					return nullptr;
+					auto url = m_service->schema->get_order_info_url(m_service->account_id, id);
+					auto response = m_service->execute_request(web::http::methods::GET, url);
+					const auto order_info = response.at(L"order");
+					const auto order_type = order_info.at(L"type").as_string();
+					if (L"MARKET" == order_type)
+					{
+						std::wstring linked_trade_id;
+						if (L"FILLED" == order_info.at(L"state").as_string())
+						{
+							linked_trade_id = order_info.at(L"tradeOpenedID").as_string();
+						}
+
+						return std::make_shared<order_impl>(id, linked_trade_id, m_service);
+					}
+
+					throw std::runtime_error(sb::to_str(L"Unsupported order type! Order type: " + order_type));
 				}
 
 				virtual trade::ptr find_trade(const std::wstring& id) const override
 				{
-					return nullptr;
+					// SB: just to check that trade exists
+					const auto url = m_service->schema->get_trade_info_url(m_service->account_id, id);
+					auto response = m_service->execute_request(web::http::methods::GET, url);
+
+					return std::make_shared<trade_impl>(id, m_service);
 				}
 
 			public:
 				connector_impl(const settings::ptr& settings, const authentication::ptr& auth)
-					: m_token(auth->get_token())
-					, m_account_id(get_value<std::wstring>(settings, L"account_id"))
-					, m_schema(std::make_shared<schema>(get_value<std::wstring>(settings, L"url"), L"v3"))
+					: m_service(std::make_shared<service_client>(auth->get_token(), get_value<std::wstring>(settings, L"account_id"), std::make_shared<service_schema>(get_value<std::wstring>(settings, L"url"), L"v3")))
 				{
 					LOG_DBG << L"OANDA Connector has been created successfully!";
 				}
@@ -672,10 +850,10 @@ namespace tbp
 		///////////////////////////////////////////////////////////////////////////////////////
 		// market order params
 
-		data_t create_market_order_params(const std::wstring& instrument_id, long amount)
+		data_t create_market_order_params(const std::wstring& instrument_id, double amount)
 		{
 			data_t params;
-			params[L"units"] = __int64(amount);
+			params[L"units"] = amount;
 			params[L"instrument"] = instrument_id;
 			params[L"timeInForce"] = std::wstring(L"FOK");
 			params[L"type"] = std::wstring(L"MARKET");

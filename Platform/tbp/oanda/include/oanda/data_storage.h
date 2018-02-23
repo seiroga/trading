@@ -15,6 +15,7 @@ namespace tbp
 				extern const std::wstring c_volume;
 				extern const std::wstring c_bid_candlestick;
 				extern const std::wstring c_ask_candlestick;
+				extern const std::wstring c_complete;
 			}
 
 			namespace instant_data

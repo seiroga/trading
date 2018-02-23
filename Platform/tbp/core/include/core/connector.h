@@ -65,9 +65,9 @@ namespace tbp
 	public:
 		virtual std::wstring id() const = 0;
 		virtual state_t state() const = 0;
-		virtual long amount() const = 0;
-		virtual double current_profit() const = 0;
-		virtual void close(unsigned long amount_to_close = -1L) = 0;
+		virtual double amount() const = 0;
+		virtual double profit(bool unrealized) const = 0;
+		virtual void close(double amount_to_close) = 0;
 	};
 
 	/////////////////////////////////////////////////////////////////////
@@ -106,6 +106,7 @@ namespace tbp
 	public:
 		virtual std::vector<std::wstring> get_instruments() const = 0;
 		virtual double available_balance() const = 0;
+		virtual double margin_rate() const = 0;
 		virtual std::vector<data_t::ptr> get_data(const std::wstring& instrument_id, unsigned long granularity, time_t* start_datetime, time_t* end_datetime) const = 0;
 		virtual data_t::ptr get_instant_data(const std::wstring& instrument_id) = 0;
 		virtual order::ptr create_order(const data_t& params) = 0;

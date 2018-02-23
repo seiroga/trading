@@ -1,8 +1,11 @@
 #pragma once
 
-#include <common/constrains.h>
+#include <core/connector.h>
+#include <core/data_storage.h>
+#include <core/trader.h>
+#include <core/settings.h>
 
-#include <boost/signals2.hpp>
+#include <common/constrains.h>
 
 #include <memory>
 #include <string>
@@ -13,9 +16,16 @@ namespace tbp
 	{
 	public:
 		using ptr = std::shared_ptr<strategy>;
+	};
+
+	struct pattern_base
+	{
+	public:
+		using ptr = std::shared_ptr<pattern_base>;
 
 	public:
-		virtual void start() = 0;
-		virtual void stop() = 0;
+		virtual bool check(const std::vector<candlestick_data>& data) = 0;
 	};
+
+	strategy::ptr create_ema_strategy(const data_provider::ptr& dp, const connector::ptr& c, const trader::ptr& t, const settings::ptr& s);
 }

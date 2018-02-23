@@ -141,6 +141,7 @@
     <ClCompile Include="src\analysis.cpp" />
     <ClCompile Include="src\data_collector.cpp" />
     <ClCompile Include="src\settings.cpp" />
+    <ClCompile Include="src\strategy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core\analysis.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="include\core\settings.h" />
     <ClInclude Include="include\core\strategy.h" />
     <ClInclude Include="include\core\trader.h" />
+    <ClInclude Include="include\core\utilities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

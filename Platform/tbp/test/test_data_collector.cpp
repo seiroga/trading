@@ -3,6 +3,7 @@
 #include <mock/mock_connector.h>
 
 #include <core/data_collector.h>
+#include <core/utilities.h>
 
 #include <test_helpers/base_fixture.h>
 
@@ -72,14 +73,9 @@ namespace
 		tbp::settings::ptr settings;
 
 	public:
-		static auto align_to_granularity(const tbp::time_t& time, const std::chrono::seconds& granularity)
-		{
-			return (time.time_since_epoch() / granularity) * granularity;
-		}
-
 		bool is_aligned_to(const tbp::time_t& time, const std::chrono::seconds& granularity)
 		{
-			return time.time_since_epoch() == std::chrono::duration_cast<tbp::time_t::duration>(align_to_granularity(time, granularity));
+			return time.time_since_epoch() == tbp::align_to_granularity<tbp::time_t::duration>(time, granularity);
 		}
 
 	public:

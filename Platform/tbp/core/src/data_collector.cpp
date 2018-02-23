@@ -1,4 +1,5 @@
 #include <core/data_collector.h>
+#include <core/utilities.h>
 
 #include <logging/log.h>
 
@@ -28,15 +29,10 @@ namespace tbp
 				std::to_wstring(st.wMinute) + L":" + std::to_wstring(st.wSecond) + (0 != st.wMilliseconds ? L"." + std::to_wstring(st.wMilliseconds) : L".000000000") + L"Z";
 		}
 
-		auto align_to_granularity(const tbp::time_t& time , std::chrono::seconds granularity)
-		{
-			return (time.time_since_epoch() / granularity) * granularity;
-		}
-
 		unsigned long get_millisecs_delay_till_next_request(std::chrono::seconds granularity)
 		{
 			auto curr_time = tbp::time_t::clock::now();
-			auto aligned_next_time = align_to_granularity(curr_time, granularity) + granularity;
+			auto aligned_next_time = align_to_granularity<tbp::time_t::duration>(curr_time, granularity) + granularity;
 			auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(aligned_next_time - curr_time.time_since_epoch());
 			
 			// SB: this additional delay needed to compensate inaccuracy of system timer and 
@@ -123,16 +119,29 @@ namespace tbp
 			try
 			{
 				auto curr_time = tbp::time_t::clock::now();
-				curr_time = tbp::time_t(std::chrono::duration_cast<tbp::time_t::duration>(align_to_granularity(curr_time, granularity_secs)));
+				curr_time = tbp::time_t(align_to_granularity<tbp::time_t::duration>(curr_time, granularity_secs));
 				auto start_time = curr_time - granularity_secs;
-				auto data = m_connector->get_data(m_instrument_id, m_historcial_data_granularity, &start_time, &curr_time);
-				m_data_storage->save_data(m_instrument_id, m_historcial_data_granularity, data);
+				auto data = m_connector->get_data(m_instrument_id, m_historcial_data_granularity, &start_time, nullptr);
+				if (!data.empty())
+				{
+					m_data_storage->save_data(m_instrument_id, m_historcial_data_granularity, data);
+					on_historical_data(m_instrument_id, data);
+				}
+				else
+				{
+					// SB: strange case but we need to retry
+					LOG_DBG << L"Connector has returned empty data on get historical data request!";
 
-				on_historical_data(m_instrument_id, data);
+					wait_interval = 1000;
+					continue;
+				}
 			}
 			catch (const tbp::http_exception& ex)
 			{
 				LOG_ERR << L"Exception was thrown during HTTP request. Code: " << ex.code << L" Info: " << ex.what();
+
+				wait_interval = 1000;
+				continue;
 			}
 			catch (const std::exception& ex)
 			{
@@ -206,7 +215,7 @@ namespace tbp
 
 	data_collector::data_collector(const std::wstring& instrument_id, const settings::ptr& s, const tbp::connector::ptr& connector, const data_storage::ptr& ds)
 		: m_cache_size(get_value<int>(s, L"DataCollectorCacheSize", 100))
-		, m_historcial_data_granularity(get_value<int>(s, L"DataGranulatiry", 60))
+		, m_historcial_data_granularity(get_value<int>(s, L"DataGranularity", 60))
 		, m_start_evt(true, false)
 		, m_stop_evt(true, false)
 		, m_instrument_id(instrument_id)

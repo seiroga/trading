@@ -13,8 +13,8 @@ struct mock_trade : public tbp::trade
 {
 	std::wstring remote_id;
 	state_t current_state;
-	long trading_amount;
-	double profit;
+	double trading_amount;
+	double curr_profit;
 
 public:
 	virtual std::wstring id() const override
@@ -27,17 +27,17 @@ public:
 		return current_state;
 	}
 
-	virtual long amount() const override
+	virtual double amount() const override
 	{
 		return trading_amount;
 	}
 
-	virtual double current_profit() const override
+	virtual double profit(bool unrealized) const override
 	{
-		return profit;
+		return curr_profit;
 	}
 
-	virtual void close(unsigned long amount_to_close = -1L) override
+	virtual void close(double amount_to_close) override
 	{
 		current_state = state_t::closed;
 	}
@@ -46,6 +46,8 @@ public:
 	mock_trade(const std::wstring& id, state_t st)
 		: remote_id(id)
 		, current_state(st)
+		, trading_amount(0.0)
+		, curr_profit(0.0)
 	{
 	}
 };
@@ -138,6 +140,11 @@ public:
 	virtual double available_balance() const override
 	{
 		return 0.0;
+	}
+
+	virtual double margin_rate() const override
+	{
+		return 1.0;
 	}
 
 	virtual tbp::data_t::ptr get_instant_data(const std::wstring& instrument_id) override

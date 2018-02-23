@@ -1,5 +1,7 @@
 #include "application.h"
 
+#include <oanda/connector.h>
+
 #include <logging/log.h>
 #include <win/thread.h>
 #include <win/fs.h>
@@ -32,12 +34,10 @@ namespace tbp
 		// SB: create trader
 		m_trader = m_factory->create_trader(m_connector);
 
-		auto balance = m_connector->available_balance();
-
 		// SB: create strategy
-		// ...........
+		m_strategy = create_ema_strategy(m_data_collector, m_connector, m_trader, m_settings);
 
-		//m_data_collector->start();
+		m_data_collector->start();
 
 		start_ui_thread();
 

@@ -1,11 +1,14 @@
 #include <oanda/trader.h>
 #include <oanda/connector.h>
+#include <oanda/data_storage.h>
 
 #include <logging/log.h>
 #include <sqlite/sqlite.h>
 
 #include <win/fs.h>
 #include <win/com/utils.h>
+
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <functional>
 
@@ -27,6 +30,17 @@ namespace tbp
 			std::wstring generate_id()
 			{
 				return win::com::guid_to_str(win::com::generate_guid());
+			}
+
+			tbp::candle_info get_candle_info(const tbp::data_t& candle_data)
+			{
+				tbp::candle_info result;
+				result.open = tbp::get<double>(candle_data.at(values::candlestick_data::c_open_price));
+				result.high = tbp::get<double>(candle_data.at(values::candlestick_data::c_high_price));
+				result.low = tbp::get<double>(candle_data.at(values::candlestick_data::c_low_price));
+				result.close = tbp::get<double>(candle_data.at(values::candlestick_data::c_close_price));
+
+				return result;
 			}
 		}
 
@@ -151,13 +165,9 @@ namespace tbp
 				st->bind_value(static_cast<int>(state), 1);
 				st->bind_value(internal_id, 2);
 
-				if (st->step())
+				if (!st->step())
 				{
 					LOG_DBG << L"Update order state to " << int(state) << L". Order internal ID: " << internal_id;
-				}
-				else
-				{
-					LOG_ERR << L"Unable to update order state to " << int(state) << L". Order not found. Order internal ID: " << internal_id;
 				}
 			}
 
@@ -171,13 +181,9 @@ namespace tbp
 				st->bind_value(static_cast<int>(state), 1);
 				st->bind_value(internal_id, 2);
 
-				if (st->step())
+				if (!st->step())
 				{
 					LOG_DBG << L"Update trade state to " << int(state) << L". Trade internal ID: " << internal_id;
-				}
-				else
-				{
-					LOG_ERR << L"Unable to update trade state to " << int(state) << L". Trade not found. Trade internal ID: " << internal_id;
 				}
 			}
 
@@ -299,7 +305,7 @@ namespace tbp
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		// trader implementation
 
-		std::wstring trader::open_trade(const std::wstring& instrument_id, long amount)
+		std::wstring trader::open_trade(const std::wstring& instrument_id, double amount)
 		{
 			std::wstring internal_id;
 
@@ -311,6 +317,11 @@ namespace tbp
 				{
 					internal_id = generate_id();
 					auto trade = m_connector->find_trade(order->trade_id());
+					if (nullptr == trade)
+					{
+						LOG_ERR << L"Order \"" << order->id() << L"\" was filled. But linked trade \"" << order->trade_id() << "\" wasn't found by connector!";
+					}
+
 					m_db->register_order(internal_id, order, trade);
 				}
 				break;
@@ -327,7 +338,7 @@ namespace tbp
 					internal_id = generate_id();
 					m_db->register_order(internal_id, order, nullptr);
 
-					throw trade_canceled("Order was created successfully, but wasn't canceled by broker!");
+					throw trade_canceled("Order was created successfully, but was canceled by broker!");
 				}
 				break;
 			}
@@ -335,7 +346,7 @@ namespace tbp
 			return internal_id;
 		}
 
-		void trader::close_trade(const std::wstring& internal_id, long amount)
+		void trader::close_trade(const std::wstring& internal_id, double amount)
 		{
 			const auto remote_id = m_db->get_remote_id(internal_id);
 			auto order = m_connector->find_order(remote_id);
@@ -377,7 +388,7 @@ namespace tbp
 						trade->close(amount);
 						m_db->set_trade_state(trade_id, trade->state());
 
-						LOG_DBG << (L"Trade closed. Trade remote ID: " + trade_id + L". Amount closed: " + std::to_wstring(amount));
+						LOG_DBG << (L"Trade closed. Trade remote ID: " + trade_id + L". Realized profit: " + std::to_wstring(trade->profit(false)));
 					}
 					else
 					{
@@ -431,19 +442,30 @@ namespace tbp
 
 		void trader::close_pending_trades()
 		{
+			LOG_DBG << L"Closing all opened trades...";
+
 			// SB: cancel all pending orders
 			auto pending_orders = m_db->get_pending_orders();
 			for (const auto& order_id : pending_orders)
 			{
 				auto order = m_connector->find_order(order_id.remote_id);
-				auto state = order->state();
-				if (order::state_t::pending == state)
+				if (nullptr != order)
 				{
-					order->cancel();
-					state = order->state();
-				}
+					auto state = order->state();
+					if (order::state_t::pending == state)
+					{
+						order->cancel();
+						state = order->state();
 
-				m_db->set_order_state(order_id.internal_id, state);
+						LOG_DBG << L"Order has been canceld. Remote ID: " + order_id.remote_id;
+					}
+
+					m_db->set_order_state(order_id.internal_id, state);
+				}
+				else
+				{
+					LOG_WARN << L"Unable to close order!. Order wasn't found by connector. Order remote ID: " << order_id.remote_id;
+				}
 			}
 
 			// SB: close all pending trades
@@ -453,14 +475,53 @@ namespace tbp
 				auto trade = m_connector->find_trade(trade_id.remote_id);
 				if (nullptr != trade)
 				{
-					trade->close();
+					trade->close(0.0);
 					m_db->set_trade_state(trade->id(), trade->state());
+
+					LOG_DBG << (L"Trade has been closed. Remote ID: " + trade_id.remote_id + L". Realized profit: " + std::to_wstring(trade->profit(false)));
 				}
 				else
 				{
-					LOG_WARN << L"Unable update trade state. Trade wasn't found by connector. Trade remote ID: " << trade_id.remote_id;
+					LOG_WARN << L"Unable to close trade!. Trade wasn't found by connector. Trade remote ID: " << trade_id.remote_id;
 				}
 			}
+
+			LOG_DBG << L"All pending trades has beed closed!";
+		}
+
+		std::vector<candlestick_data> trader::get_candles_from_data(const std::vector<data_t::ptr>& candles_data) const
+		{
+			std::vector<candlestick_data> result;
+			for (const auto& candle_data : candles_data)
+			{
+				candlestick_data candle;
+				
+				// VOLUME
+				candle.volume = boost::numeric_cast<int>(tbp::get<__int64>(candle_data->at(values::instrument_data::c_volume)));
+
+				// TIMESTAMP
+				candle.timestamp = tbp::get<time_t>(candle_data->at(values::instrument_data::c_timestamp));
+
+				// BID
+				candle.bid = get_candle_info(tbp::get<data_t>(candle_data->at(values::instrument_data::c_bid_candlestick)));
+
+				// ASK
+				candle.ask = get_candle_info(tbp::get<data_t>(candle_data->at(values::instrument_data::c_ask_candlestick)));
+
+				// COMPLETE
+				// SB: when data is got from connector it contains "complete" attribute
+				// if from DB, data doesn't contain "complete" attribute
+				// by default complete attribute is set to true
+				auto complete_it = candle_data->find(values::instrument_data::c_complete);
+				if (candle_data->end() != complete_it)
+				{
+					candle.complete = tbp::get<bool>(complete_it->second);
+				}
+
+				result.emplace_back(std::move(candle));
+			}
+
+			return result;
 		}
 
 		trader::trader(const tbp::connector::ptr& c, const std::wstring& working_dir)
@@ -479,6 +540,17 @@ namespace tbp
 
 		trader::~trader()
 		{
+			LOG_ERR << L"Begin trader shutdown...";
+
+			try
+			{
+				close_pending_trades();
+			}
+			catch (...)
+			{
+				LOG_ERR << L"Exception was thrown during closing all opened trades!";
+			}
+
 			LOG_DBG << L"Trader has been destroyed!";
 		}
 	}

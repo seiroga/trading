@@ -21,9 +21,11 @@ namespace tbp
 			void update_objects_states();
 
 		public:
-			virtual std::wstring open_trade(const std::wstring& instrument_id, long amount) override;
-			virtual void close_trade(const std::wstring& internal_id, long amount) override;
+			virtual std::wstring open_trade(const std::wstring& instrument_id, double amount) override;
+			virtual void close_trade(const std::wstring& internal_id, double amount) override;
 			virtual void close_pending_trades() override;
+
+			virtual std::vector<candlestick_data> get_candles_from_data(const std::vector<data_t::ptr>& candles_data) const override;
 
 		public:
 			trader(const tbp::connector::ptr& c, const std::wstring& working_dir);
