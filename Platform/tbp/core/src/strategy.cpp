@@ -71,8 +71,25 @@ namespace tbp
 
 			void on_historical_data(const std::wstring& instrument_id, const std::vector<data_t::ptr>& data)
 			{
-				m_trade_frame.pop_front();
 				auto candles = m_trader->get_candles_from_data(data);
+				if (candles.size() >= 2)
+				{
+					LOG_INFO << __FUNCTIONW__ << L" Arrived candles count is: " << candles.size();
+
+					// SB: can happen f.e. if request failed several times
+					while(candles.size() >= 2)
+					{
+						auto candle = candles.back();
+						if (candle.complete)
+						{
+							candles.assign(1, candle);
+						}
+
+						candles.pop_back();
+					}
+				}
+
+				m_trade_frame.pop_front();
 				m_trade_frame.insert(m_trade_frame.end(), candles.begin(), candles.end());
 
 				std::vector<double> ask_values;
@@ -90,9 +107,9 @@ namespace tbp
 				calculate_slow_ema(ask_values);
 
 				// SB: try to find latest crossing
-				//for (auto i = m_fast_ema_frame.size() - 1; i >= 1; --i)
+				//for (auto i = m_fast_ema_frame.size() - 1; i >= m_fast_ema_frame.size() - candles.size() - 1; --i)
 				{
-					size_t i = m_fast_ema_frame.size() - 1;
+					auto i = m_fast_ema_frame.size() - 1;
 					auto fast_val = m_fast_ema_frame[i];
 					auto fast_prev_val = m_fast_ema_frame[i - 1];
 

@@ -57,6 +57,9 @@ namespace tbp
 
 	void data_collector::collect_instant_data_thread()
 	{
+		// SB: temporary disable instant data collecting
+		return;
+
 		auto res = win::wait_for_multiple_objects(false, INFINITE, m_start_evt, m_stop_evt);
 		if (1 == res.second)
 		{
