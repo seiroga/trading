@@ -1,6 +1,6 @@
 {
     "WorkingInstrument" : "EUR_USD",
     "DataCollectorCacheSize" : 1000,
-    "DataGranularity" : 60,
-    "TradeFrame" : 3600 
+    "DataGranularity" : 1800,
+    "TradeFrame" : 129600 
 }

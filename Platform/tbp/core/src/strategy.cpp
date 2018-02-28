@@ -33,12 +33,12 @@ namespace tbp
 		private:
 			void calculate_fast_ema(const std::vector<double>& values)
 			{
-				analysis::calculate_ema(values, &m_fast_ema_frame, 7);
+				analysis::calculate_ema(values, &m_fast_ema_frame, 9);
 			}
 
 			void calculate_slow_ema(const std::vector<double>& values)
 			{
-				analysis::calculate_ema(values, &m_slow_ema_frame, 20);
+				analysis::calculate_ema(values, &m_slow_ema_frame, 26);
 			}
 
 			double margin_rate()
