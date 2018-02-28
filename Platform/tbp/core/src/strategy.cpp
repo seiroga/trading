@@ -27,15 +27,18 @@ namespace tbp
 			std::wstring m_opened_trade_id;
 			boost::signals2::connection m_historical_data_connection;
 
+			double m_cross_value;
+			bool m_waiting_for_threshold;
+
 		private:
 			void calculate_fast_ema(const std::vector<double>& values)
 			{
-				analysis::calculate_ema(values, &m_fast_ema_frame, 9);
+				analysis::calculate_ema(values, &m_fast_ema_frame, 7);
 			}
 
 			void calculate_slow_ema(const std::vector<double>& values)
 			{
-				analysis::calculate_ema(values, &m_slow_ema_frame, 26);
+				analysis::calculate_ema(values, &m_slow_ema_frame, 20);
 			}
 
 			double margin_rate()
@@ -140,13 +143,23 @@ namespace tbp
 
 					if (fast_prev_val <= slow_prev_val && fast_val > slow_val)
 					{
-						// SB: raise, buy instrument
-						open_trade(false);
+						m_cross_value = (fast_val + fast_prev_val) / 2.0;
+						m_waiting_for_threshold = true;
 					}
 					else if (fast_prev_val >= slow_prev_val && fast_val < slow_val)
 					{
-						// SB: fall, sell instrument
-						open_trade(true);
+						m_cross_value = (fast_val + fast_prev_val) / 2.0;
+						m_waiting_for_threshold = true;
+					}
+
+					const double threshold_value = abs(candles.back().ask.close - candles.back().bid.close) / 2.0;
+					const double curr_diff = fast_val - m_cross_value;
+					if (m_waiting_for_threshold && abs(curr_diff) >= threshold_value)
+					{
+						m_waiting_for_threshold = false;
+
+						// SB: raise, buy instrument
+						open_trade(curr_diff < 0.0);
 					}
 				}
 			}
@@ -161,6 +174,8 @@ namespace tbp
 				, m_trader(t)
 				, m_margin_rate(0.0)
 				, m_historical_data_connection(m_data_provider->on_historical_data.connect(std::bind(&ema_strategy_impl::on_historical_data, this, std::placeholders::_1, std::placeholders::_2)))
+				, m_cross_value(0.0)
+				, m_waiting_for_threshold(false)
 			{
 				init_historical_data();
 			}
