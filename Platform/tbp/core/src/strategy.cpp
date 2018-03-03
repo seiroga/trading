@@ -145,11 +145,15 @@ namespace tbp
 					{
 						m_cross_value = (fast_val + fast_prev_val) / 2.0;
 						m_waiting_for_threshold = true;
+
+						LOG_DBG << L"EMA crossing detected. Growing. Cross value: " << m_cross_value;
 					}
 					else if (fast_prev_val >= slow_prev_val && fast_val < slow_val)
 					{
 						m_cross_value = (fast_val + fast_prev_val) / 2.0;
 						m_waiting_for_threshold = true;
+
+						LOG_DBG << L"EMA crossing detected. Falling. Cross value: " << m_cross_value;
 					}
 
 					const double threshold_value = abs(candles.back().ask.close - candles.back().bid.close) / 2.0;
@@ -158,7 +162,9 @@ namespace tbp
 					{
 						m_waiting_for_threshold = false;
 
-						// SB: raise, buy instrument
+						LOG_DBG << L"Threshold reached. Threshold value is: " << threshold_value;
+
+						// SB: open trade
 						open_trade(curr_diff < 0.0);
 					}
 				}
